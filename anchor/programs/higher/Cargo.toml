@@ -1,12 +1,12 @@
 [package]
-name = "vault"
+name = "higher"
 version = "0.1.0"
-description = "A simple SOL vault program"
+description = "King of the Hill game on Solana"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "vault"
+name = "higher"
 
 [features]
 default = []

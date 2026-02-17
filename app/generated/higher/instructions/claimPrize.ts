@@ -10,7 +10,6 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
-  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
   getProgramDerivedAddress,
@@ -32,24 +31,21 @@ import {
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
-import { VAULT_PROGRAM_ADDRESS } from "../programs";
-import {
-  expectAddress,
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared";
+import { HIGHER_PROGRAM_ADDRESS } from "../programs";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared";
 
-export const WITHDRAW_DISCRIMINATOR = new Uint8Array([
-  183, 18, 70, 156, 148, 109, 161, 34,
+export const CLAIM_PRIZE_DISCRIMINATOR = new Uint8Array([
+  157, 233, 139, 121, 246, 62, 234, 235,
 ]);
 
-export function getWithdrawDiscriminatorBytes() {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(WITHDRAW_DISCRIMINATOR);
+export function getClaimPrizeDiscriminatorBytes() {
+  return fixEncoderSize(getBytesEncoder(), 8).encode(CLAIM_PRIZE_DISCRIMINATOR);
 }
 
-export type WithdrawInstruction<
-  TProgram extends string = typeof VAULT_PROGRAM_ADDRESS,
-  TAccountSigner extends string | AccountMeta<string> = string,
+export type ClaimPrizeInstruction<
+  TProgram extends string = typeof HIGHER_PROGRAM_ADDRESS,
+  TAccountKing extends string | AccountMeta<string> = string,
+  TAccountGameState extends string | AccountMeta<string> = string,
   TAccountVault extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
@@ -58,10 +54,12 @@ export type WithdrawInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountSigner extends string
-        ? WritableSignerAccount<TAccountSigner> &
-            AccountSignerMeta<TAccountSigner>
-        : TAccountSigner,
+      TAccountKing extends string
+        ? WritableSignerAccount<TAccountKing> & AccountSignerMeta<TAccountKing>
+        : TAccountKing,
+      TAccountGameState extends string
+        ? WritableAccount<TAccountGameState>
+        : TAccountGameState,
       TAccountVault extends string
         ? WritableAccount<TAccountVault>
         : TAccountVault,
@@ -72,69 +70,76 @@ export type WithdrawInstruction<
     ]
   >;
 
-export type WithdrawInstructionData = { discriminator: ReadonlyUint8Array };
+export type ClaimPrizeInstructionData = { discriminator: ReadonlyUint8Array };
 
-export type WithdrawInstructionDataArgs = {};
+export type ClaimPrizeInstructionDataArgs = {};
 
-export function getWithdrawInstructionDataEncoder(): FixedSizeEncoder<WithdrawInstructionDataArgs> {
+export function getClaimPrizeInstructionDataEncoder(): FixedSizeEncoder<ClaimPrizeInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: WITHDRAW_DISCRIMINATOR }),
+    (value) => ({ ...value, discriminator: CLAIM_PRIZE_DISCRIMINATOR }),
   );
 }
 
-export function getWithdrawInstructionDataDecoder(): FixedSizeDecoder<WithdrawInstructionData> {
+export function getClaimPrizeInstructionDataDecoder(): FixedSizeDecoder<ClaimPrizeInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
   ]);
 }
 
-export function getWithdrawInstructionDataCodec(): FixedSizeCodec<
-  WithdrawInstructionDataArgs,
-  WithdrawInstructionData
+export function getClaimPrizeInstructionDataCodec(): FixedSizeCodec<
+  ClaimPrizeInstructionDataArgs,
+  ClaimPrizeInstructionData
 > {
   return combineCodec(
-    getWithdrawInstructionDataEncoder(),
-    getWithdrawInstructionDataDecoder(),
+    getClaimPrizeInstructionDataEncoder(),
+    getClaimPrizeInstructionDataDecoder(),
   );
 }
 
-export type WithdrawAsyncInput<
-  TAccountSigner extends string = string,
+export type ClaimPrizeAsyncInput<
+  TAccountKing extends string = string,
+  TAccountGameState extends string = string,
   TAccountVault extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
-  signer: TransactionSigner<TAccountSigner>;
+  king: TransactionSigner<TAccountKing>;
+  gameState?: Address<TAccountGameState>;
+  /** The vault PDA holding the pot */
   vault?: Address<TAccountVault>;
   systemProgram?: Address<TAccountSystemProgram>;
 };
 
-export async function getWithdrawInstructionAsync<
-  TAccountSigner extends string,
+export async function getClaimPrizeInstructionAsync<
+  TAccountKing extends string,
+  TAccountGameState extends string,
   TAccountVault extends string,
   TAccountSystemProgram extends string,
-  TProgramAddress extends Address = typeof VAULT_PROGRAM_ADDRESS,
+  TProgramAddress extends Address = typeof HIGHER_PROGRAM_ADDRESS,
 >(
-  input: WithdrawAsyncInput<
-    TAccountSigner,
+  input: ClaimPrizeAsyncInput<
+    TAccountKing,
+    TAccountGameState,
     TAccountVault,
     TAccountSystemProgram
   >,
   config?: { programAddress?: TProgramAddress },
 ): Promise<
-  WithdrawInstruction<
+  ClaimPrizeInstruction<
     TProgramAddress,
-    TAccountSigner,
+    TAccountKing,
+    TAccountGameState,
     TAccountVault,
     TAccountSystemProgram
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? VAULT_PROGRAM_ADDRESS;
+  const programAddress = config?.programAddress ?? HIGHER_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
-    signer: { value: input.signer ?? null, isWritable: true },
+    king: { value: input.king ?? null, isWritable: true },
+    gameState: { value: input.gameState ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
@@ -144,12 +149,21 @@ export async function getWithdrawInstructionAsync<
   >;
 
   // Resolve default values.
+  if (!accounts.gameState.value) {
+    accounts.gameState.value = await getProgramDerivedAddress({
+      programAddress,
+      seeds: [
+        getBytesEncoder().encode(
+          new Uint8Array([103, 97, 109, 101, 95, 115, 116, 97, 116, 101]),
+        ),
+      ],
+    });
+  }
   if (!accounts.vault.value) {
     accounts.vault.value = await getProgramDerivedAddress({
       programAddress,
       seeds: [
         getBytesEncoder().encode(new Uint8Array([118, 97, 117, 108, 116])),
-        getAddressEncoder().encode(expectAddress(accounts.signer.value)),
       ],
     });
   }
@@ -161,50 +175,63 @@ export async function getWithdrawInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.signer),
+      getAccountMeta(accounts.king),
+      getAccountMeta(accounts.gameState),
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getWithdrawInstructionDataEncoder().encode({}),
+    data: getClaimPrizeInstructionDataEncoder().encode({}),
     programAddress,
-  } as WithdrawInstruction<
+  } as ClaimPrizeInstruction<
     TProgramAddress,
-    TAccountSigner,
+    TAccountKing,
+    TAccountGameState,
     TAccountVault,
     TAccountSystemProgram
   >);
 }
 
-export type WithdrawInput<
-  TAccountSigner extends string = string,
+export type ClaimPrizeInput<
+  TAccountKing extends string = string,
+  TAccountGameState extends string = string,
   TAccountVault extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
-  signer: TransactionSigner<TAccountSigner>;
+  king: TransactionSigner<TAccountKing>;
+  gameState: Address<TAccountGameState>;
+  /** The vault PDA holding the pot */
   vault: Address<TAccountVault>;
   systemProgram?: Address<TAccountSystemProgram>;
 };
 
-export function getWithdrawInstruction<
-  TAccountSigner extends string,
+export function getClaimPrizeInstruction<
+  TAccountKing extends string,
+  TAccountGameState extends string,
   TAccountVault extends string,
   TAccountSystemProgram extends string,
-  TProgramAddress extends Address = typeof VAULT_PROGRAM_ADDRESS,
+  TProgramAddress extends Address = typeof HIGHER_PROGRAM_ADDRESS,
 >(
-  input: WithdrawInput<TAccountSigner, TAccountVault, TAccountSystemProgram>,
+  input: ClaimPrizeInput<
+    TAccountKing,
+    TAccountGameState,
+    TAccountVault,
+    TAccountSystemProgram
+  >,
   config?: { programAddress?: TProgramAddress },
-): WithdrawInstruction<
+): ClaimPrizeInstruction<
   TProgramAddress,
-  TAccountSigner,
+  TAccountKing,
+  TAccountGameState,
   TAccountVault,
   TAccountSystemProgram
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? VAULT_PROGRAM_ADDRESS;
+  const programAddress = config?.programAddress ?? HIGHER_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
-    signer: { value: input.signer ?? null, isWritable: true },
+    king: { value: input.king ?? null, isWritable: true },
+    gameState: { value: input.gameState ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
@@ -222,42 +249,46 @@ export function getWithdrawInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.signer),
+      getAccountMeta(accounts.king),
+      getAccountMeta(accounts.gameState),
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getWithdrawInstructionDataEncoder().encode({}),
+    data: getClaimPrizeInstructionDataEncoder().encode({}),
     programAddress,
-  } as WithdrawInstruction<
+  } as ClaimPrizeInstruction<
     TProgramAddress,
-    TAccountSigner,
+    TAccountKing,
+    TAccountGameState,
     TAccountVault,
     TAccountSystemProgram
   >);
 }
 
-export type ParsedWithdrawInstruction<
-  TProgram extends string = typeof VAULT_PROGRAM_ADDRESS,
+export type ParsedClaimPrizeInstruction<
+  TProgram extends string = typeof HIGHER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
-    signer: TAccountMetas[0];
-    vault: TAccountMetas[1];
-    systemProgram: TAccountMetas[2];
+    king: TAccountMetas[0];
+    gameState: TAccountMetas[1];
+    /** The vault PDA holding the pot */
+    vault: TAccountMetas[2];
+    systemProgram: TAccountMetas[3];
   };
-  data: WithdrawInstructionData;
+  data: ClaimPrizeInstructionData;
 };
 
-export function parseWithdrawInstruction<
+export function parseClaimPrizeInstruction<
   TProgram extends string,
   TAccountMetas extends readonly AccountMeta[],
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
-): ParsedWithdrawInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 3) {
+): ParsedClaimPrizeInstruction<TProgram, TAccountMetas> {
+  if (instruction.accounts.length < 4) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -270,10 +301,11 @@ export function parseWithdrawInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      signer: getNextAccount(),
+      king: getNextAccount(),
+      gameState: getNextAccount(),
       vault: getNextAccount(),
       systemProgram: getNextAccount(),
     },
-    data: getWithdrawInstructionDataDecoder().decode(instruction.data),
+    data: getClaimPrizeInstructionDataDecoder().decode(instruction.data),
   };
 }

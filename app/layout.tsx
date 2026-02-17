@@ -15,8 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Solana dApp Starter",
-  description: "A minimal Next.js starter powered by @solana/react-hooks",
+  title: "Higher — King of the Hill on Solana",
+  description:
+    "Pay SOL to become the King. The last one standing claims the entire pot. Built on Solana testnet.",
   icons: {
     icon: "/icon.svg",
     shortcut: "/icon.svg",

@@ -1,6 +1,6 @@
 "use client";
 import { useWalletConnection } from "@solana/react-hooks";
-import { VaultCard } from "./components/vault-card";
+import { GameCard } from "./components/game-card";
 
 export default function Home() {
   const { connectors, connect, disconnect, wallet, status } =
@@ -9,151 +9,93 @@ export default function Home() {
   const address = wallet?.account.address.toString();
 
   return (
-    <div className="relative min-h-screen overflow-x-clip bg-bg1 text-foreground">
-      <main className="relative z-10 mx-auto flex min-h-screen max-w-4xl flex-col gap-10 border-x border-border-low px-6 py-16">
-        <header className="space-y-3">
-          <p className="text-sm uppercase tracking-[0.18em] text-muted">
-            Solana starter kit
-          </p>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-            Ship a Solana dapp fast
+    <div className="relative min-h-screen overflow-x-clip text-foreground">
+      <main className="relative z-10 mx-auto flex min-h-screen max-w-3xl flex-col gap-8 px-4 sm:px-6 py-12">
+        {/* Header */}
+        <header className="text-center space-y-3">
+          <div className="text-5xl mb-2">👑</div>
+          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gold-gradient">
+            HIGHER
           </h1>
-          <p className="max-w-3xl text-base leading-relaxed text-muted">
-            Drop in <code className="font-mono">@solana/react-hooks</code>, wrap
-            your tree once, and you get wallet connect/disconnect plus
-            ready-to-use hooks for balances and transactions—no manual RPC
-            wiring.
+          <p className="text-sm uppercase tracking-[0.2em] text-muted">
+            King of the Hill on Solana
           </p>
-          <ul className="mt-4 space-y-2 text-sm text-foreground">
-            <li className="flex gap-2">
-              <span
-                className="mt-1.5 h-2 w-2 rounded-full bg-foreground/60"
-                aria-hidden
-              />
-              <div>
-                <a
-                  className="font-medium underline underline-offset-2"
-                  href="https://solana.com/docs"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Solana docs
-                </a>{" "}
-                — core concepts, RPC, programs, and client patterns.
-              </div>
-            </li>
-            <li className="flex gap-2">
-              <span
-                className="mt-1.5 h-2 w-2 rounded-full bg-foreground/60"
-                aria-hidden
-              />
-              <div>
-                <a
-                  className="font-medium underline underline-offset-2"
-                  href="https://www.anchor-lang.com/docs/introduction"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Anchor docs
-                </a>{" "}
-                — build and test programs with IDL, macros, and type-safe
-                clients.
-              </div>
-            </li>
-            <li className="flex gap-2">
-              <span
-                className="mt-1.5 h-2 w-2 rounded-full bg-foreground/60"
-                aria-hidden
-              />
-              <div>
-                <a
-                  className="font-medium underline underline-offset-2"
-                  href="https://faucet.solana.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Solana faucet (devnet)
-                </a>{" "}
-                — grab free devnet SOL to try transfers and transactions.
-              </div>
-            </li>
-            <li className="flex gap-2">
-              <span
-                className="mt-1.5 h-2 w-2 rounded-full bg-foreground/60"
-                aria-hidden
-              />
-              <div>
-                <a
-                  className="font-medium underline underline-offset-2"
-                  href="https://github.com/solana-foundation/framework-kit/tree/main/packages/react-hooks"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  @solana/react-hooks README
-                </a>{" "}
-                — how this starter wires the client, connectors, and hooks.
-              </div>
-            </li>
-          </ul>
+          <p className="max-w-xl mx-auto text-sm leading-relaxed text-muted">
+            Pay SOL to become the reigning King. Each new King raises the price
+            by 20%. When the timer expires, the last King standing claims the
+            entire pot.
+          </p>
         </header>
 
-        <section className="w-full max-w-3xl space-y-4 rounded-2xl border border-border-low bg-card p-6 shadow-[0_20px_80px_-50px_rgba(0,0,0,0.35)]">
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-1">
-              <p className="text-lg font-semibold">Wallet connection</p>
-              <p className="text-sm text-muted">
-                Pick any discovered connector and manage connect / disconnect in
-                one spot.
+        {/* Wallet Connection */}
+        <section className="w-full max-w-2xl mx-auto rounded-2xl border border-border-low bg-card p-5 shadow-[0_20px_60px_-40px_rgba(255,215,0,0.08)]">
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <div>
+              <p className="text-sm font-semibold">Wallet</p>
+              <p className="text-xs text-muted">
+                {status === "connected"
+                  ? "Connected to Solana testnet"
+                  : "Connect a wallet to play"}
               </p>
             </div>
-            <span className="rounded-full bg-cream px-3 py-1 text-xs font-semibold uppercase tracking-wide text-foreground/80">
-              {status === "connected" ? "Connected" : "Not connected"}
-            </span>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            {connectors.map((connector) => (
-              <button
-                key={connector.id}
-                onClick={() => connect(connector.id)}
-                disabled={status === "connecting"}
-                className="group flex items-center justify-between rounded-xl border border-border-low bg-card px-4 py-3 text-left text-sm font-medium transition hover:-translate-y-0.5 hover:shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <span className="flex flex-col">
-                  <span className="text-base">{connector.name}</span>
-                  <span className="text-xs text-muted">
-                    {status === "connecting"
-                      ? "Connecting…"
-                      : status === "connected" &&
-                          wallet?.connector.id === connector.id
-                        ? "Active"
-                        : "Tap to connect"}
-                  </span>
-                </span>
-                <span
-                  aria-hidden
-                  className="h-2.5 w-2.5 rounded-full bg-border-low transition group-hover:bg-primary/80"
-                />
-              </button>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 border-t border-border-low pt-4 text-sm">
-            <span className="rounded-lg border border-border-low bg-cream px-3 py-2 font-mono text-xs">
-              {address ?? "No wallet connected"}
-            </span>
-            <button
-              onClick={() => disconnect()}
-              disabled={status !== "connected"}
-              className="inline-flex items-center gap-2 rounded-lg border border-border-low bg-card px-3 py-2 font-medium transition hover:-translate-y-0.5 hover:shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+            <span
+              className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${status === "connected"
+                  ? "bg-green-500/15 text-green-400"
+                  : "bg-red-500/10 text-red-400"
+                }`}
             >
-              Disconnect
-            </button>
+              {status === "connected" ? "● Live" : "○ Offline"}
+            </span>
           </div>
+
+          {status !== "connected" ? (
+            <div className="grid gap-2 sm:grid-cols-2">
+              {connectors.map((connector) => (
+                <button
+                  key={connector.id}
+                  onClick={() => connect(connector.id)}
+                  disabled={status === "connecting"}
+                  className="group flex items-center justify-between rounded-xl border border-border-low bg-card px-4 py-3 text-left text-sm font-medium transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_8px_30px_-15px_rgba(255,215,0,0.15)] cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <span className="flex flex-col">
+                    <span className="text-sm">{connector.name}</span>
+                    <span className="text-[10px] text-muted">
+                      {status === "connecting"
+                        ? "Connecting…"
+                        : "Tap to connect"}
+                    </span>
+                  </span>
+                  <span
+                    aria-hidden
+                    className="h-2 w-2 rounded-full bg-border-low transition group-hover:bg-primary/60"
+                  />
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <span className="flex-1 truncate rounded-lg border border-border-low bg-cream px-3 py-2 font-mono text-xs">
+                {address}
+              </span>
+              <button
+                onClick={() => disconnect()}
+                className="rounded-lg border border-border-low bg-card px-4 py-2 text-xs font-semibold transition hover:-translate-y-0.5 hover:shadow-sm cursor-pointer"
+              >
+                Disconnect
+              </button>
+            </div>
+          )}
         </section>
 
-        {/* Vault Program Section */}
-        <VaultCard />
+        {/* Game Card */}
+        <GameCard />
+
+        {/* Footer */}
+        <footer className="text-center pb-8">
+          <p className="text-[10px] text-muted/50 uppercase tracking-[0.15em]">
+            Built on Solana Testnet • Anchor Framework
+          </p>
+        </footer>
       </main>
     </div>
   );

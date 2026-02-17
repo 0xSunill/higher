@@ -10,14 +10,11 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
-  getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
   getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
-  getU64Decoder,
-  getU64Encoder,
   transformEncoder,
   type AccountMeta,
   type AccountSignerMeta,
@@ -34,24 +31,23 @@ import {
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
-import { VAULT_PROGRAM_ADDRESS } from "../programs";
-import {
-  expectAddress,
-  getAccountMetaFactory,
-  type ResolvedAccount,
-} from "../shared";
+import { HIGHER_PROGRAM_ADDRESS } from "../programs";
+import { getAccountMetaFactory, type ResolvedAccount } from "../shared";
 
-export const DEPOSIT_DISCRIMINATOR = new Uint8Array([
-  242, 35, 198, 137, 82, 225, 242, 182,
+export const INITIALIZE_GAME_DISCRIMINATOR = new Uint8Array([
+  44, 62, 102, 247, 126, 208, 130, 215,
 ]);
 
-export function getDepositDiscriminatorBytes() {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(DEPOSIT_DISCRIMINATOR);
+export function getInitializeGameDiscriminatorBytes() {
+  return fixEncoderSize(getBytesEncoder(), 8).encode(
+    INITIALIZE_GAME_DISCRIMINATOR,
+  );
 }
 
-export type DepositInstruction<
-  TProgram extends string = typeof VAULT_PROGRAM_ADDRESS,
-  TAccountSigner extends string | AccountMeta<string> = string,
+export type InitializeGameInstruction<
+  TProgram extends string = typeof HIGHER_PROGRAM_ADDRESS,
+  TAccountAuthority extends string | AccountMeta<string> = string,
+  TAccountGameState extends string | AccountMeta<string> = string,
   TAccountVault extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
@@ -60,10 +56,13 @@ export type DepositInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountSigner extends string
-        ? WritableSignerAccount<TAccountSigner> &
-            AccountSignerMeta<TAccountSigner>
-        : TAccountSigner,
+      TAccountAuthority extends string
+        ? WritableSignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
+        : TAccountAuthority,
+      TAccountGameState extends string
+        ? WritableAccount<TAccountGameState>
+        : TAccountGameState,
       TAccountVault extends string
         ? WritableAccount<TAccountVault>
         : TAccountVault,
@@ -74,77 +73,78 @@ export type DepositInstruction<
     ]
   >;
 
-export type DepositInstructionData = {
+export type InitializeGameInstructionData = {
   discriminator: ReadonlyUint8Array;
-  amount: bigint;
 };
 
-export type DepositInstructionDataArgs = { amount: number | bigint };
+export type InitializeGameInstructionDataArgs = {};
 
-export function getDepositInstructionDataEncoder(): FixedSizeEncoder<DepositInstructionDataArgs> {
+export function getInitializeGameInstructionDataEncoder(): FixedSizeEncoder<InitializeGameInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["amount", getU64Encoder()],
-    ]),
-    (value) => ({ ...value, discriminator: DEPOSIT_DISCRIMINATOR }),
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: INITIALIZE_GAME_DISCRIMINATOR }),
   );
 }
 
-export function getDepositInstructionDataDecoder(): FixedSizeDecoder<DepositInstructionData> {
+export function getInitializeGameInstructionDataDecoder(): FixedSizeDecoder<InitializeGameInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-    ["amount", getU64Decoder()],
   ]);
 }
 
-export function getDepositInstructionDataCodec(): FixedSizeCodec<
-  DepositInstructionDataArgs,
-  DepositInstructionData
+export function getInitializeGameInstructionDataCodec(): FixedSizeCodec<
+  InitializeGameInstructionDataArgs,
+  InitializeGameInstructionData
 > {
   return combineCodec(
-    getDepositInstructionDataEncoder(),
-    getDepositInstructionDataDecoder(),
+    getInitializeGameInstructionDataEncoder(),
+    getInitializeGameInstructionDataDecoder(),
   );
 }
 
-export type DepositAsyncInput<
-  TAccountSigner extends string = string,
+export type InitializeGameAsyncInput<
+  TAccountAuthority extends string = string,
+  TAccountGameState extends string = string,
   TAccountVault extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
-  signer: TransactionSigner<TAccountSigner>;
+  authority: TransactionSigner<TAccountAuthority>;
+  gameState?: Address<TAccountGameState>;
+  /** The vault PDA that holds the pot SOL */
   vault?: Address<TAccountVault>;
   systemProgram?: Address<TAccountSystemProgram>;
-  amount: DepositInstructionDataArgs["amount"];
 };
 
-export async function getDepositInstructionAsync<
-  TAccountSigner extends string,
+export async function getInitializeGameInstructionAsync<
+  TAccountAuthority extends string,
+  TAccountGameState extends string,
   TAccountVault extends string,
   TAccountSystemProgram extends string,
-  TProgramAddress extends Address = typeof VAULT_PROGRAM_ADDRESS,
+  TProgramAddress extends Address = typeof HIGHER_PROGRAM_ADDRESS,
 >(
-  input: DepositAsyncInput<
-    TAccountSigner,
+  input: InitializeGameAsyncInput<
+    TAccountAuthority,
+    TAccountGameState,
     TAccountVault,
     TAccountSystemProgram
   >,
   config?: { programAddress?: TProgramAddress },
 ): Promise<
-  DepositInstruction<
+  InitializeGameInstruction<
     TProgramAddress,
-    TAccountSigner,
+    TAccountAuthority,
+    TAccountGameState,
     TAccountVault,
     TAccountSystemProgram
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? VAULT_PROGRAM_ADDRESS;
+  const programAddress = config?.programAddress ?? HIGHER_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
-    signer: { value: input.signer ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: true },
+    gameState: { value: input.gameState ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
@@ -153,16 +153,22 @@ export async function getDepositInstructionAsync<
     ResolvedAccount
   >;
 
-  // Original args.
-  const args = { ...input };
-
   // Resolve default values.
+  if (!accounts.gameState.value) {
+    accounts.gameState.value = await getProgramDerivedAddress({
+      programAddress,
+      seeds: [
+        getBytesEncoder().encode(
+          new Uint8Array([103, 97, 109, 101, 95, 115, 116, 97, 116, 101]),
+        ),
+      ],
+    });
+  }
   if (!accounts.vault.value) {
     accounts.vault.value = await getProgramDerivedAddress({
       programAddress,
       seeds: [
         getBytesEncoder().encode(new Uint8Array([118, 97, 117, 108, 116])),
-        getAddressEncoder().encode(expectAddress(accounts.signer.value)),
       ],
     });
   }
@@ -174,53 +180,63 @@ export async function getDepositInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.signer),
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.gameState),
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getDepositInstructionDataEncoder().encode(
-      args as DepositInstructionDataArgs,
-    ),
+    data: getInitializeGameInstructionDataEncoder().encode({}),
     programAddress,
-  } as DepositInstruction<
+  } as InitializeGameInstruction<
     TProgramAddress,
-    TAccountSigner,
+    TAccountAuthority,
+    TAccountGameState,
     TAccountVault,
     TAccountSystemProgram
   >);
 }
 
-export type DepositInput<
-  TAccountSigner extends string = string,
+export type InitializeGameInput<
+  TAccountAuthority extends string = string,
+  TAccountGameState extends string = string,
   TAccountVault extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
-  signer: TransactionSigner<TAccountSigner>;
+  authority: TransactionSigner<TAccountAuthority>;
+  gameState: Address<TAccountGameState>;
+  /** The vault PDA that holds the pot SOL */
   vault: Address<TAccountVault>;
   systemProgram?: Address<TAccountSystemProgram>;
-  amount: DepositInstructionDataArgs["amount"];
 };
 
-export function getDepositInstruction<
-  TAccountSigner extends string,
+export function getInitializeGameInstruction<
+  TAccountAuthority extends string,
+  TAccountGameState extends string,
   TAccountVault extends string,
   TAccountSystemProgram extends string,
-  TProgramAddress extends Address = typeof VAULT_PROGRAM_ADDRESS,
+  TProgramAddress extends Address = typeof HIGHER_PROGRAM_ADDRESS,
 >(
-  input: DepositInput<TAccountSigner, TAccountVault, TAccountSystemProgram>,
+  input: InitializeGameInput<
+    TAccountAuthority,
+    TAccountGameState,
+    TAccountVault,
+    TAccountSystemProgram
+  >,
   config?: { programAddress?: TProgramAddress },
-): DepositInstruction<
+): InitializeGameInstruction<
   TProgramAddress,
-  TAccountSigner,
+  TAccountAuthority,
+  TAccountGameState,
   TAccountVault,
   TAccountSystemProgram
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? VAULT_PROGRAM_ADDRESS;
+  const programAddress = config?.programAddress ?? HIGHER_PROGRAM_ADDRESS;
 
   // Original accounts.
   const originalAccounts = {
-    signer: { value: input.signer ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: true },
+    gameState: { value: input.gameState ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
@@ -228,9 +244,6 @@ export function getDepositInstruction<
     keyof typeof originalAccounts,
     ResolvedAccount
   >;
-
-  // Original args.
-  const args = { ...input };
 
   // Resolve default values.
   if (!accounts.systemProgram.value) {
@@ -241,44 +254,46 @@ export function getDepositInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.signer),
+      getAccountMeta(accounts.authority),
+      getAccountMeta(accounts.gameState),
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getDepositInstructionDataEncoder().encode(
-      args as DepositInstructionDataArgs,
-    ),
+    data: getInitializeGameInstructionDataEncoder().encode({}),
     programAddress,
-  } as DepositInstruction<
+  } as InitializeGameInstruction<
     TProgramAddress,
-    TAccountSigner,
+    TAccountAuthority,
+    TAccountGameState,
     TAccountVault,
     TAccountSystemProgram
   >);
 }
 
-export type ParsedDepositInstruction<
-  TProgram extends string = typeof VAULT_PROGRAM_ADDRESS,
+export type ParsedInitializeGameInstruction<
+  TProgram extends string = typeof HIGHER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
-    signer: TAccountMetas[0];
-    vault: TAccountMetas[1];
-    systemProgram: TAccountMetas[2];
+    authority: TAccountMetas[0];
+    gameState: TAccountMetas[1];
+    /** The vault PDA that holds the pot SOL */
+    vault: TAccountMetas[2];
+    systemProgram: TAccountMetas[3];
   };
-  data: DepositInstructionData;
+  data: InitializeGameInstructionData;
 };
 
-export function parseDepositInstruction<
+export function parseInitializeGameInstruction<
   TProgram extends string,
   TAccountMetas extends readonly AccountMeta[],
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
-): ParsedDepositInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 3) {
+): ParsedInitializeGameInstruction<TProgram, TAccountMetas> {
+  if (instruction.accounts.length < 4) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -291,10 +306,11 @@ export function parseDepositInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      signer: getNextAccount(),
+      authority: getNextAccount(),
+      gameState: getNextAccount(),
       vault: getNextAccount(),
       systemProgram: getNextAccount(),
     },
-    data: getDepositInstructionDataDecoder().decode(instruction.data),
+    data: getInitializeGameInstructionDataDecoder().decode(instruction.data),
   };
 }

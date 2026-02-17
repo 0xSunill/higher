@@ -1,31 +1,42 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0); /* deep neutral */
-  --border-strong: oklch(0.839 0.0187 78.23);
-  --border-low: oklch(0.927 0.0122 96.43);
-  --accent: oklch(0 0 0);
-  --muted: #3a3a3a; /* darker for better light-mode contrast */
-  --cream: oklch(0.9553 0.0029 84.56);
-  --card: #ffffff;
-  --card-foreground: oklch(0.145 0 0);
-  --radius: 0.625rem;
+  /* Dark-first premium theme */
+  --background: #0a0a0f;
+  --foreground: #f0f0f5;
+  --border-strong: rgba(255, 215, 0, 0.25);
+  --border-low: rgba(255, 255, 255, 0.06);
+  --accent: #ffd700;
+  --accent-hover: #ffec80;
+  --muted: #8a8a9a;
+  --cream: rgba(255, 215, 0, 0.08);
+  --card: #12121a;
+  --card-foreground: #f0f0f5;
+  --radius: 0.75rem;
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --glow-gold: 0 0 40px rgba(255, 215, 0, 0.15);
+  --glow-gold-strong: 0 0 60px rgba(255, 215, 0, 0.25);
+  --gradient-crown: linear-gradient(135deg, #ffd700, #ffb800, #ff8c00);
+  --gradient-bg: radial-gradient(ellipse at top, #1a1520 0%, #0a0a0f 60%);
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --border-strong: oklch(1 0 0 / 0.12);
-    --border-low: oklch(1 0 0 / 0.08);
-    --accent: oklch(0.922 0 0);
-    --muted: oklch(0.75 0.01 260); /* brighten muted text in dark mode */
-    --cream: oklch(0.22 0.009 70.82);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
+    --background: #f5f3f0;
+    --foreground: #1a1a2e;
+    --border-strong: rgba(200, 160, 0, 0.3);
+    --border-low: rgba(0, 0, 0, 0.08);
+    --accent: #d4a000;
+    --accent-hover: #b88f00;
+    --muted: #6a6a7a;
+    --cream: rgba(200, 160, 0, 0.08);
+    --card: #ffffff;
+    --card-foreground: #1a1a2e;
+    --glow-gold: 0 0 30px rgba(200, 160, 0, 0.1);
+    --glow-gold-strong: 0 0 50px rgba(200, 160, 0, 0.2);
+    --gradient-crown: linear-gradient(135deg, #d4a000, #b88f00, #996600);
+    --gradient-bg: radial-gradient(ellipse at top, #f5f0e8 0%, #f5f3f0 60%);
   }
 }
 
@@ -56,6 +67,65 @@
   body {
     @apply bg-bg1 text-foreground antialiased;
     font-family: var(--font-sans);
-    color-scheme: light dark;
+    color-scheme: dark light;
+    background: var(--gradient-bg);
+    min-height: 100vh;
   }
+}
+
+/* Crown emoji pulse */
+@keyframes crown-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: var(--glow-gold); }
+  50% { box-shadow: var(--glow-gold-strong); }
+}
+
+@keyframes countdown-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-crown-pulse {
+  animation: crown-pulse 2s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+.animate-countdown-pulse {
+  animation: countdown-pulse 1s ease-in-out infinite;
+}
+
+/* Gold gradient text */
+.text-gold-gradient {
+  background: var(--gradient-crown);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gold button */
+.btn-gold {
+  background: var(--gradient-crown);
+  color: #0a0a0f;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-gold:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-gold-strong);
+}
+
+.btn-gold:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
 }
