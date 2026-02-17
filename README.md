@@ -116,3 +116,4 @@ This uses [Codama](https://github.com/codama-idl/codama) to generate a type-safe
 - [Deploying Programs](https://solana.com/docs/programs/deploying) - deployment guide
 - [framework-kit](https://github.com/solana-foundation/framework-kit) - the React hooks used here
 - [Codama](https://github.com/codama-idl/codama) - client generation from IDL
+# higher-demp
