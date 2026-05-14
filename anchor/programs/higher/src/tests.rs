@@ -15,11 +15,11 @@ mod tests {
     const STARTING_PRICE: u64 = 10_000_000; // 0.01 SOL
 
     fn get_game_state_pda() -> (Pubkey, u8) {
-        Pubkey::find_program_address(&[b"game_state"], &PROGRAM_ID)
+        Pubkey::find_program_address(&[b"game_state_v2"], &PROGRAM_ID)
     }
 
     fn get_vault_pda() -> (Pubkey, u8) {
-        Pubkey::find_program_address(&[b"vault"], &PROGRAM_ID)
+        Pubkey::find_program_address(&[b"vault_v2"], &PROGRAM_ID)
     }
 
     // Pre-computed Anchor discriminators: sha256("global:<name>")[0..8]
@@ -62,14 +62,15 @@ mod tests {
         }
     }
 
-    fn create_claim_prize_ix(king: &Pubkey) -> Instruction {
+    fn create_claim_prize_ix(king: &Pubkey, payer: &Pubkey) -> Instruction {
         let (game_state_pda, _) = get_game_state_pda();
         let (vault_pda, _) = get_vault_pda();
 
         Instruction {
             program_id: PROGRAM_ID,
             accounts: vec![
-                AccountMeta::new(*king, true),
+                AccountMeta::new(*king, false), // king is NOT a signer anymore
+                AccountMeta::new(*payer, true), // payer IS a signer
                 AccountMeta::new(game_state_pda, false),
                 AccountMeta::new(vault_pda, false),
                 AccountMeta::new_readonly(system_program::ID, false),
@@ -99,6 +100,8 @@ mod tests {
     // game_active:    offset 88, 1 byte
     // bump:           offset 89, 1 byte
     // vault_bump:     offset 90, 1 byte
+    // recent_winners: offset 91, 220 bytes
+    // round_number:   offset 311, 4 bytes
 
     #[test]
     fn test_initialize_game() {
@@ -314,7 +317,7 @@ mod tests {
         svm.send_transaction(tx).unwrap();
 
         // Try to claim before timer expires - should fail
-        let ix = create_claim_prize_ix(&player.pubkey());
+        let ix = create_claim_prize_ix(&player.pubkey(), &player.pubkey());
         let blockhash = svm.latest_blockhash();
         let tx = Transaction::new_signed_with_payer(
             &[ix],
@@ -328,7 +331,7 @@ mod tests {
     }
 
     #[test]
-    fn test_claim_prize_fails_for_non_king() {
+    fn test_claim_prize_permissionless() {
         let mut svm = LiteSVM::new();
 
         let program_bytes = include_bytes!("../../../target/deploy/higher.so");
@@ -354,7 +357,7 @@ mod tests {
         svm.airdrop(&player1.pubkey(), 10 * LAMPORTS_PER_SOL)
             .unwrap();
 
-        let ix = create_become_king_ix(&player1.pubkey(), 12500); // 1.25x multiplier
+        let ix = create_become_king_ix(&player1.pubkey(), 12500);
         let blockhash = svm.latest_blockhash();
         let tx = Transaction::new_signed_with_payer(
             &[ix],
@@ -365,23 +368,31 @@ mod tests {
         svm.send_transaction(tx).unwrap();
 
         // Warp time past end_time
-        svm.warp_to_slot(100_000);
+        let mut clock = svm.get_sysvar::<solana_sdk::sysvar::clock::Clock>();
+        clock.unix_timestamp += 200; // > 120s timer
+        svm.set_sysvar(&clock);
 
-        // Non-king (player2) tries to claim
+        // Player 2 triggers claim FOR player 1
         let player2 = Keypair::new();
-        svm.airdrop(&player2.pubkey(), 10 * LAMPORTS_PER_SOL)
+        svm.airdrop(&player2.pubkey(), 1 * LAMPORTS_PER_SOL)
             .unwrap();
 
-        let ix = create_claim_prize_ix(&player2.pubkey());
+        let initial_p1_balance = svm.get_account(&player1.pubkey()).unwrap().lamports;
+
+        // Note: king is player1.pubkey(), payer is player2.pubkey()
+        let ix = create_claim_prize_ix(&player1.pubkey(), &player2.pubkey());
         let blockhash = svm.latest_blockhash();
         let tx = Transaction::new_signed_with_payer(
             &[ix],
-            Some(&player2.pubkey()),
-            &[&player2],
+            Some(&player2.pubkey()), // player2 pays for the tx
+            &[&player2], // player2 signs
             blockhash,
         );
 
         let result = svm.send_transaction(tx);
-        assert!(result.is_err(), "Non-king should not be able to claim");
+        assert!(result.is_ok(), "Anyone should be able to trigger the claim for the king. Error: {:?}", result.err());
+
+        let final_p1_balance = svm.get_account(&player1.pubkey()).unwrap().lamports;
+        assert!(final_p1_balance > initial_p1_balance, "Player 1 should have received the prize");
     }
 }

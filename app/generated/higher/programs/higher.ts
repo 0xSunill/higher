@@ -19,9 +19,11 @@ import {
 import {
   parseBecomeKingInstruction,
   parseClaimPrizeInstruction,
+  parseCloseGameInstruction,
   parseInitializeGameInstruction,
   type ParsedBecomeKingInstruction,
   type ParsedClaimPrizeInstruction,
+  type ParsedCloseGameInstruction,
   type ParsedInitializeGameInstruction,
 } from "../instructions";
 
@@ -55,6 +57,7 @@ export function identifyHigherAccount(
 export enum HigherInstruction {
   BecomeKing,
   ClaimPrize,
+  CloseGame,
   InitializeGame,
 }
 
@@ -88,6 +91,17 @@ export function identifyHigherInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([237, 236, 157, 201, 253, 20, 248, 67]),
+      ),
+      0,
+    )
+  ) {
+    return HigherInstruction.CloseGame;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
         new Uint8Array([44, 62, 102, 247, 126, 208, 130, 215]),
       ),
       0,
@@ -110,6 +124,9 @@ export type ParsedHigherInstruction<
       instructionType: HigherInstruction.ClaimPrize;
     } & ParsedClaimPrizeInstruction<TProgram>)
   | ({
+      instructionType: HigherInstruction.CloseGame;
+    } & ParsedCloseGameInstruction<TProgram>)
+  | ({
       instructionType: HigherInstruction.InitializeGame;
     } & ParsedInitializeGameInstruction<TProgram>);
 
@@ -130,6 +147,13 @@ export function parseHigherInstruction<TProgram extends string>(
       return {
         instructionType: HigherInstruction.ClaimPrize,
         ...parseClaimPrizeInstruction(instruction),
+      };
+    }
+    case HigherInstruction.CloseGame: {
+      assertIsInstructionWithAccounts(instruction);
+      return {
+        instructionType: HigherInstruction.CloseGame,
+        ...parseCloseGameInstruction(instruction),
       };
     }
     case HigherInstruction.InitializeGame: {

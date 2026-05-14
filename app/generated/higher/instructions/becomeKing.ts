@@ -15,6 +15,8 @@ import {
   getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
+  getU64Decoder,
+  getU64Encoder,
   transformEncoder,
   type AccountMeta,
   type AccountSignerMeta,
@@ -71,13 +73,19 @@ export type BecomeKingInstruction<
     ]
   >;
 
-export type BecomeKingInstructionData = { discriminator: ReadonlyUint8Array };
+export type BecomeKingInstructionData = {
+  discriminator: ReadonlyUint8Array;
+  multiplierBps: bigint;
+};
 
-export type BecomeKingInstructionDataArgs = {};
+export type BecomeKingInstructionDataArgs = { multiplierBps: number | bigint };
 
 export function getBecomeKingInstructionDataEncoder(): FixedSizeEncoder<BecomeKingInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    getStructEncoder([
+      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
+      ["multiplierBps", getU64Encoder()],
+    ]),
     (value) => ({ ...value, discriminator: BECOME_KING_DISCRIMINATOR }),
   );
 }
@@ -85,6 +93,7 @@ export function getBecomeKingInstructionDataEncoder(): FixedSizeEncoder<BecomeKi
 export function getBecomeKingInstructionDataDecoder(): FixedSizeDecoder<BecomeKingInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
+    ["multiplierBps", getU64Decoder()],
   ]);
 }
 
@@ -109,6 +118,7 @@ export type BecomeKingAsyncInput<
   /** The vault PDA receiving SOL */
   vault?: Address<TAccountVault>;
   systemProgram?: Address<TAccountSystemProgram>;
+  multiplierBps: BecomeKingInstructionDataArgs["multiplierBps"];
 };
 
 export async function getBecomeKingInstructionAsync<
@@ -149,13 +159,18 @@ export async function getBecomeKingInstructionAsync<
     ResolvedAccount
   >;
 
+  // Original args.
+  const args = { ...input };
+
   // Resolve default values.
   if (!accounts.gameState.value) {
     accounts.gameState.value = await getProgramDerivedAddress({
       programAddress,
       seeds: [
         getBytesEncoder().encode(
-          new Uint8Array([103, 97, 109, 101, 95, 115, 116, 97, 116, 101]),
+          new Uint8Array([
+            103, 97, 109, 101, 95, 115, 116, 97, 116, 101, 95, 118, 50,
+          ]),
         ),
       ],
     });
@@ -164,7 +179,9 @@ export async function getBecomeKingInstructionAsync<
     accounts.vault.value = await getProgramDerivedAddress({
       programAddress,
       seeds: [
-        getBytesEncoder().encode(new Uint8Array([118, 97, 117, 108, 116])),
+        getBytesEncoder().encode(
+          new Uint8Array([118, 97, 117, 108, 116, 95, 118, 50]),
+        ),
       ],
     });
   }
@@ -181,7 +198,9 @@ export async function getBecomeKingInstructionAsync<
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getBecomeKingInstructionDataEncoder().encode({}),
+    data: getBecomeKingInstructionDataEncoder().encode(
+      args as BecomeKingInstructionDataArgs,
+    ),
     programAddress,
   } as BecomeKingInstruction<
     TProgramAddress,
@@ -203,6 +222,7 @@ export type BecomeKingInput<
   /** The vault PDA receiving SOL */
   vault: Address<TAccountVault>;
   systemProgram?: Address<TAccountSystemProgram>;
+  multiplierBps: BecomeKingInstructionDataArgs["multiplierBps"];
 };
 
 export function getBecomeKingInstruction<
@@ -241,6 +261,9 @@ export function getBecomeKingInstruction<
     ResolvedAccount
   >;
 
+  // Original args.
+  const args = { ...input };
+
   // Resolve default values.
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
@@ -255,7 +278,9 @@ export function getBecomeKingInstruction<
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getBecomeKingInstructionDataEncoder().encode({}),
+    data: getBecomeKingInstructionDataEncoder().encode(
+      args as BecomeKingInstructionDataArgs,
+    ),
     programAddress,
   } as BecomeKingInstruction<
     TProgramAddress,

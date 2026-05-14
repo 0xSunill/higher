@@ -34,21 +34,18 @@ import {
 import { HIGHER_PROGRAM_ADDRESS } from "../programs";
 import { getAccountMetaFactory, type ResolvedAccount } from "../shared";
 
-export const INITIALIZE_GAME_DISCRIMINATOR = new Uint8Array([
-  44, 62, 102, 247, 126, 208, 130, 215,
+export const CLOSE_GAME_DISCRIMINATOR = new Uint8Array([
+  237, 236, 157, 201, 253, 20, 248, 67,
 ]);
 
-export function getInitializeGameDiscriminatorBytes() {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(
-    INITIALIZE_GAME_DISCRIMINATOR,
-  );
+export function getCloseGameDiscriminatorBytes() {
+  return fixEncoderSize(getBytesEncoder(), 8).encode(CLOSE_GAME_DISCRIMINATOR);
 }
 
-export type InitializeGameInstruction<
+export type CloseGameInstruction<
   TProgram extends string = typeof HIGHER_PROGRAM_ADDRESS,
   TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountGameState extends string | AccountMeta<string> = string,
-  TAccountVault extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
@@ -63,9 +60,6 @@ export type InitializeGameInstruction<
       TAccountGameState extends string
         ? WritableAccount<TAccountGameState>
         : TAccountGameState,
-      TAccountVault extends string
-        ? WritableAccount<TAccountVault>
-        : TAccountVault,
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
@@ -73,68 +67,60 @@ export type InitializeGameInstruction<
     ]
   >;
 
-export type InitializeGameInstructionData = {
-  discriminator: ReadonlyUint8Array;
-};
+export type CloseGameInstructionData = { discriminator: ReadonlyUint8Array };
 
-export type InitializeGameInstructionDataArgs = {};
+export type CloseGameInstructionDataArgs = {};
 
-export function getInitializeGameInstructionDataEncoder(): FixedSizeEncoder<InitializeGameInstructionDataArgs> {
+export function getCloseGameInstructionDataEncoder(): FixedSizeEncoder<CloseGameInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: INITIALIZE_GAME_DISCRIMINATOR }),
+    (value) => ({ ...value, discriminator: CLOSE_GAME_DISCRIMINATOR }),
   );
 }
 
-export function getInitializeGameInstructionDataDecoder(): FixedSizeDecoder<InitializeGameInstructionData> {
+export function getCloseGameInstructionDataDecoder(): FixedSizeDecoder<CloseGameInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
   ]);
 }
 
-export function getInitializeGameInstructionDataCodec(): FixedSizeCodec<
-  InitializeGameInstructionDataArgs,
-  InitializeGameInstructionData
+export function getCloseGameInstructionDataCodec(): FixedSizeCodec<
+  CloseGameInstructionDataArgs,
+  CloseGameInstructionData
 > {
   return combineCodec(
-    getInitializeGameInstructionDataEncoder(),
-    getInitializeGameInstructionDataDecoder(),
+    getCloseGameInstructionDataEncoder(),
+    getCloseGameInstructionDataDecoder(),
   );
 }
 
-export type InitializeGameAsyncInput<
+export type CloseGameAsyncInput<
   TAccountAuthority extends string = string,
   TAccountGameState extends string = string,
-  TAccountVault extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
   authority: TransactionSigner<TAccountAuthority>;
   gameState?: Address<TAccountGameState>;
-  /** The vault PDA that holds the pot SOL */
-  vault?: Address<TAccountVault>;
   systemProgram?: Address<TAccountSystemProgram>;
 };
 
-export async function getInitializeGameInstructionAsync<
+export async function getCloseGameInstructionAsync<
   TAccountAuthority extends string,
   TAccountGameState extends string,
-  TAccountVault extends string,
   TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof HIGHER_PROGRAM_ADDRESS,
 >(
-  input: InitializeGameAsyncInput<
+  input: CloseGameAsyncInput<
     TAccountAuthority,
     TAccountGameState,
-    TAccountVault,
     TAccountSystemProgram
   >,
   config?: { programAddress?: TProgramAddress },
 ): Promise<
-  InitializeGameInstruction<
+  CloseGameInstruction<
     TProgramAddress,
     TAccountAuthority,
     TAccountGameState,
-    TAccountVault,
     TAccountSystemProgram
   >
 > {
@@ -145,7 +131,6 @@ export async function getInitializeGameInstructionAsync<
   const originalAccounts = {
     authority: { value: input.authority ?? null, isWritable: true },
     gameState: { value: input.gameState ?? null, isWritable: true },
-    vault: { value: input.vault ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<
@@ -159,19 +144,7 @@ export async function getInitializeGameInstructionAsync<
       programAddress,
       seeds: [
         getBytesEncoder().encode(
-          new Uint8Array([
-            103, 97, 109, 101, 95, 115, 116, 97, 116, 101, 95, 118, 50,
-          ]),
-        ),
-      ],
-    });
-  }
-  if (!accounts.vault.value) {
-    accounts.vault.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(
-          new Uint8Array([118, 97, 117, 108, 116, 95, 118, 50]),
+          new Uint8Array([103, 97, 109, 101, 95, 115, 116, 97, 116, 101]),
         ),
       ],
     });
@@ -186,52 +159,44 @@ export async function getInitializeGameInstructionAsync<
     accounts: [
       getAccountMeta(accounts.authority),
       getAccountMeta(accounts.gameState),
-      getAccountMeta(accounts.vault),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getInitializeGameInstructionDataEncoder().encode({}),
+    data: getCloseGameInstructionDataEncoder().encode({}),
     programAddress,
-  } as InitializeGameInstruction<
+  } as CloseGameInstruction<
     TProgramAddress,
     TAccountAuthority,
     TAccountGameState,
-    TAccountVault,
     TAccountSystemProgram
   >);
 }
 
-export type InitializeGameInput<
+export type CloseGameInput<
   TAccountAuthority extends string = string,
   TAccountGameState extends string = string,
-  TAccountVault extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
   authority: TransactionSigner<TAccountAuthority>;
   gameState: Address<TAccountGameState>;
-  /** The vault PDA that holds the pot SOL */
-  vault: Address<TAccountVault>;
   systemProgram?: Address<TAccountSystemProgram>;
 };
 
-export function getInitializeGameInstruction<
+export function getCloseGameInstruction<
   TAccountAuthority extends string,
   TAccountGameState extends string,
-  TAccountVault extends string,
   TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof HIGHER_PROGRAM_ADDRESS,
 >(
-  input: InitializeGameInput<
+  input: CloseGameInput<
     TAccountAuthority,
     TAccountGameState,
-    TAccountVault,
     TAccountSystemProgram
   >,
   config?: { programAddress?: TProgramAddress },
-): InitializeGameInstruction<
+): CloseGameInstruction<
   TProgramAddress,
   TAccountAuthority,
   TAccountGameState,
-  TAccountVault,
   TAccountSystemProgram
 > {
   // Program address.
@@ -241,7 +206,6 @@ export function getInitializeGameInstruction<
   const originalAccounts = {
     authority: { value: input.authority ?? null, isWritable: true },
     gameState: { value: input.gameState ?? null, isWritable: true },
-    vault: { value: input.vault ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<
@@ -260,21 +224,19 @@ export function getInitializeGameInstruction<
     accounts: [
       getAccountMeta(accounts.authority),
       getAccountMeta(accounts.gameState),
-      getAccountMeta(accounts.vault),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getInitializeGameInstructionDataEncoder().encode({}),
+    data: getCloseGameInstructionDataEncoder().encode({}),
     programAddress,
-  } as InitializeGameInstruction<
+  } as CloseGameInstruction<
     TProgramAddress,
     TAccountAuthority,
     TAccountGameState,
-    TAccountVault,
     TAccountSystemProgram
   >);
 }
 
-export type ParsedInitializeGameInstruction<
+export type ParsedCloseGameInstruction<
   TProgram extends string = typeof HIGHER_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
@@ -282,22 +244,20 @@ export type ParsedInitializeGameInstruction<
   accounts: {
     authority: TAccountMetas[0];
     gameState: TAccountMetas[1];
-    /** The vault PDA that holds the pot SOL */
-    vault: TAccountMetas[2];
-    systemProgram: TAccountMetas[3];
+    systemProgram: TAccountMetas[2];
   };
-  data: InitializeGameInstructionData;
+  data: CloseGameInstructionData;
 };
 
-export function parseInitializeGameInstruction<
+export function parseCloseGameInstruction<
   TProgram extends string,
   TAccountMetas extends readonly AccountMeta[],
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
-): ParsedInitializeGameInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 4) {
+): ParsedCloseGameInstruction<TProgram, TAccountMetas> {
+  if (instruction.accounts.length < 3) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -312,9 +272,8 @@ export function parseInitializeGameInstruction<
     accounts: {
       authority: getNextAccount(),
       gameState: getNextAccount(),
-      vault: getNextAccount(),
       systemProgram: getNextAccount(),
     },
-    data: getInitializeGameInstructionDataDecoder().decode(instruction.data),
+    data: getCloseGameInstructionDataDecoder().decode(instruction.data),
   };
 }

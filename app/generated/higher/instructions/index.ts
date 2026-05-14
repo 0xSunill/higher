@@ -8,4 +8,5 @@
 
 export * from "./becomeKing";
 export * from "./claimPrize";
+export * from "./closeGame";
 export * from "./initializeGame";

@@ -45,6 +45,7 @@ export function getClaimPrizeDiscriminatorBytes() {
 export type ClaimPrizeInstruction<
   TProgram extends string = typeof HIGHER_PROGRAM_ADDRESS,
   TAccountKing extends string | AccountMeta<string> = string,
+  TAccountPayer extends string | AccountMeta<string> = string,
   TAccountGameState extends string | AccountMeta<string> = string,
   TAccountVault extends string | AccountMeta<string> = string,
   TAccountSystemProgram extends string | AccountMeta<string> =
@@ -55,8 +56,12 @@ export type ClaimPrizeInstruction<
   InstructionWithAccounts<
     [
       TAccountKing extends string
-        ? WritableSignerAccount<TAccountKing> & AccountSignerMeta<TAccountKing>
+        ? WritableAccount<TAccountKing>
         : TAccountKing,
+      TAccountPayer extends string
+        ? WritableSignerAccount<TAccountPayer> &
+            AccountSignerMeta<TAccountPayer>
+        : TAccountPayer,
       TAccountGameState extends string
         ? WritableAccount<TAccountGameState>
         : TAccountGameState,
@@ -99,11 +104,13 @@ export function getClaimPrizeInstructionDataCodec(): FixedSizeCodec<
 
 export type ClaimPrizeAsyncInput<
   TAccountKing extends string = string,
+  TAccountPayer extends string = string,
   TAccountGameState extends string = string,
   TAccountVault extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
-  king: TransactionSigner<TAccountKing>;
+  king: Address<TAccountKing>;
+  payer: TransactionSigner<TAccountPayer>;
   gameState?: Address<TAccountGameState>;
   /** The vault PDA holding the pot */
   vault?: Address<TAccountVault>;
@@ -112,6 +119,7 @@ export type ClaimPrizeAsyncInput<
 
 export async function getClaimPrizeInstructionAsync<
   TAccountKing extends string,
+  TAccountPayer extends string,
   TAccountGameState extends string,
   TAccountVault extends string,
   TAccountSystemProgram extends string,
@@ -119,6 +127,7 @@ export async function getClaimPrizeInstructionAsync<
 >(
   input: ClaimPrizeAsyncInput<
     TAccountKing,
+    TAccountPayer,
     TAccountGameState,
     TAccountVault,
     TAccountSystemProgram
@@ -128,6 +137,7 @@ export async function getClaimPrizeInstructionAsync<
   ClaimPrizeInstruction<
     TProgramAddress,
     TAccountKing,
+    TAccountPayer,
     TAccountGameState,
     TAccountVault,
     TAccountSystemProgram
@@ -139,6 +149,7 @@ export async function getClaimPrizeInstructionAsync<
   // Original accounts.
   const originalAccounts = {
     king: { value: input.king ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
     gameState: { value: input.gameState ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
@@ -154,7 +165,9 @@ export async function getClaimPrizeInstructionAsync<
       programAddress,
       seeds: [
         getBytesEncoder().encode(
-          new Uint8Array([103, 97, 109, 101, 95, 115, 116, 97, 116, 101]),
+          new Uint8Array([
+            103, 97, 109, 101, 95, 115, 116, 97, 116, 101, 95, 118, 50,
+          ]),
         ),
       ],
     });
@@ -163,7 +176,9 @@ export async function getClaimPrizeInstructionAsync<
     accounts.vault.value = await getProgramDerivedAddress({
       programAddress,
       seeds: [
-        getBytesEncoder().encode(new Uint8Array([118, 97, 117, 108, 116])),
+        getBytesEncoder().encode(
+          new Uint8Array([118, 97, 117, 108, 116, 95, 118, 50]),
+        ),
       ],
     });
   }
@@ -176,6 +191,7 @@ export async function getClaimPrizeInstructionAsync<
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.king),
+      getAccountMeta(accounts.payer),
       getAccountMeta(accounts.gameState),
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.systemProgram),
@@ -185,6 +201,7 @@ export async function getClaimPrizeInstructionAsync<
   } as ClaimPrizeInstruction<
     TProgramAddress,
     TAccountKing,
+    TAccountPayer,
     TAccountGameState,
     TAccountVault,
     TAccountSystemProgram
@@ -193,11 +210,13 @@ export async function getClaimPrizeInstructionAsync<
 
 export type ClaimPrizeInput<
   TAccountKing extends string = string,
+  TAccountPayer extends string = string,
   TAccountGameState extends string = string,
   TAccountVault extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
-  king: TransactionSigner<TAccountKing>;
+  king: Address<TAccountKing>;
+  payer: TransactionSigner<TAccountPayer>;
   gameState: Address<TAccountGameState>;
   /** The vault PDA holding the pot */
   vault: Address<TAccountVault>;
@@ -206,6 +225,7 @@ export type ClaimPrizeInput<
 
 export function getClaimPrizeInstruction<
   TAccountKing extends string,
+  TAccountPayer extends string,
   TAccountGameState extends string,
   TAccountVault extends string,
   TAccountSystemProgram extends string,
@@ -213,6 +233,7 @@ export function getClaimPrizeInstruction<
 >(
   input: ClaimPrizeInput<
     TAccountKing,
+    TAccountPayer,
     TAccountGameState,
     TAccountVault,
     TAccountSystemProgram
@@ -221,6 +242,7 @@ export function getClaimPrizeInstruction<
 ): ClaimPrizeInstruction<
   TProgramAddress,
   TAccountKing,
+  TAccountPayer,
   TAccountGameState,
   TAccountVault,
   TAccountSystemProgram
@@ -231,6 +253,7 @@ export function getClaimPrizeInstruction<
   // Original accounts.
   const originalAccounts = {
     king: { value: input.king ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
     gameState: { value: input.gameState ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
@@ -250,6 +273,7 @@ export function getClaimPrizeInstruction<
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.king),
+      getAccountMeta(accounts.payer),
       getAccountMeta(accounts.gameState),
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.systemProgram),
@@ -259,6 +283,7 @@ export function getClaimPrizeInstruction<
   } as ClaimPrizeInstruction<
     TProgramAddress,
     TAccountKing,
+    TAccountPayer,
     TAccountGameState,
     TAccountVault,
     TAccountSystemProgram
@@ -272,10 +297,11 @@ export type ParsedClaimPrizeInstruction<
   programAddress: Address<TProgram>;
   accounts: {
     king: TAccountMetas[0];
-    gameState: TAccountMetas[1];
+    payer: TAccountMetas[1];
+    gameState: TAccountMetas[2];
     /** The vault PDA holding the pot */
-    vault: TAccountMetas[2];
-    systemProgram: TAccountMetas[3];
+    vault: TAccountMetas[3];
+    systemProgram: TAccountMetas[4];
   };
   data: ClaimPrizeInstructionData;
 };
@@ -288,7 +314,7 @@ export function parseClaimPrizeInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedClaimPrizeInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 4) {
+  if (instruction.accounts.length < 5) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -302,6 +328,7 @@ export function parseClaimPrizeInstruction<
     programAddress: instruction.programAddress,
     accounts: {
       king: getNextAccount(),
+      payer: getNextAccount(),
       gameState: getNextAccount(),
       vault: getNextAccount(),
       systemProgram: getNextAccount(),

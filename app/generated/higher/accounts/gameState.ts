@@ -17,6 +17,8 @@ import {
   fixEncoderSize,
   getAddressDecoder,
   getAddressEncoder,
+  getArrayDecoder,
+  getArrayEncoder,
   getBooleanDecoder,
   getBooleanEncoder,
   getBytesDecoder,
@@ -25,6 +27,8 @@ import {
   getI64Encoder,
   getStructDecoder,
   getStructEncoder,
+  getU32Decoder,
+  getU32Encoder,
   getU64Decoder,
   getU64Encoder,
   getU8Decoder,
@@ -42,6 +46,12 @@ import {
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
 } from "@solana/kit";
+import {
+  getWinnerRecordDecoder,
+  getWinnerRecordEncoder,
+  type WinnerRecord,
+  type WinnerRecordArgs,
+} from "../types";
 
 export const GAME_STATE_DISCRIMINATOR = new Uint8Array([
   144, 94, 208, 172, 248, 99, 134, 120,
@@ -69,6 +79,10 @@ export type GameState = {
   bump: number;
   /** Bump seed for vault PDA */
   vaultBump: number;
+  /** Last 5 winners (newest at index 0) */
+  recentWinners: Array<WinnerRecord>;
+  /** Current round number (starts at 0) */
+  roundNumber: number;
 };
 
 export type GameStateArgs = {
@@ -88,6 +102,10 @@ export type GameStateArgs = {
   bump: number;
   /** Bump seed for vault PDA */
   vaultBump: number;
+  /** Last 5 winners (newest at index 0) */
+  recentWinners: Array<WinnerRecordArgs>;
+  /** Current round number (starts at 0) */
+  roundNumber: number;
 };
 
 /** Gets the encoder for {@link GameStateArgs} account data. */
@@ -103,6 +121,8 @@ export function getGameStateEncoder(): FixedSizeEncoder<GameStateArgs> {
       ["gameActive", getBooleanEncoder()],
       ["bump", getU8Encoder()],
       ["vaultBump", getU8Encoder()],
+      ["recentWinners", getArrayEncoder(getWinnerRecordEncoder(), { size: 5 })],
+      ["roundNumber", getU32Encoder()],
     ]),
     (value) => ({ ...value, discriminator: GAME_STATE_DISCRIMINATOR }),
   );
@@ -120,6 +140,8 @@ export function getGameStateDecoder(): FixedSizeDecoder<GameState> {
     ["gameActive", getBooleanDecoder()],
     ["bump", getU8Decoder()],
     ["vaultBump", getU8Decoder()],
+    ["recentWinners", getArrayDecoder(getWinnerRecordDecoder(), { size: 5 })],
+    ["roundNumber", getU32Decoder()],
   ]);
 }
 
@@ -182,5 +204,5 @@ export async function fetchAllMaybeGameState(
 }
 
 export function getGameStateSize(): number {
-  return 99;
+  return 323;
 }

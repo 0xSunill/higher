@@ -12,7 +12,7 @@ pub struct InitializeGame<'info> {
         init,
         payer = authority,
         space = 8 + GameState::INIT_SPACE,
-        seeds = [b"game_state"],
+        seeds = [b"game_state_v2"],
         bump,
     )]
     pub game_state: Account<'info, GameState>,
@@ -20,7 +20,7 @@ pub struct InitializeGame<'info> {
     /// The vault PDA that holds the pot SOL
     #[account(
         mut,
-        seeds = [b"vault"],
+        seeds = [b"vault_v2"],
         bump,
     )]
     pub vault: SystemAccount<'info>,
@@ -42,6 +42,8 @@ pub fn initialize_game(ctx: Context<InitializeGame>) -> Result<()> {
     game.game_active = true;
     game.bump = ctx.bumps.game_state;
     game.vault_bump = ctx.bumps.vault;
+    game.recent_winners = Default::default(); // Initialize empty array
+    game.round_number = 0;
 
     msg!("Game initialized! First price: {} lamports", STARTING_PRICE);
     msg!("Timer will start when the first King is crowned.");

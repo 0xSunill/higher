@@ -12,7 +12,7 @@ pub struct BecomeKing<'info> {
 
     #[account(
         mut,
-        seeds = [b"game_state"],
+        seeds = [b"game_state_v2"],
         bump = game_state.bump,
     )]
     pub game_state: Account<'info, GameState>,
@@ -20,7 +20,7 @@ pub struct BecomeKing<'info> {
     /// The vault PDA receiving SOL
     #[account(
         mut,
-        seeds = [b"vault"],
+        seeds = [b"vault_v2"],
         bump = game_state.vault_bump,
     )]
     pub vault: SystemAccount<'info>,
@@ -30,16 +30,12 @@ pub struct BecomeKing<'info> {
 
 /// Pay SOL to become the new King of the Hill.
 ///
-/// Requirements:
-/// - Game must be active
-/// - Timer must not have expired (unless no king yet — first king starts the timer)
-/// - `multiplier_bps` must be between MIN_MULTIPLIER_BPS and MAX_MULTIPLIER_BPS
+/// Handles three scenarios:
+/// 1. First king (no current king) — starts the timer
+/// 2. Normal play (timer running) — dethrone current king
+/// 3. Expired game (timer ran out, unclaimed) — auto-reset and start new round
 ///
-/// Effects:
-/// - SOL transferred to vault PDA
-/// - Caller recorded as new king
-/// - Price increases by chosen multiplier
-/// - Timer reset logic with anti-sniping
+/// The `multiplier_bps` must be between MIN_MULTIPLIER_BPS and MAX_MULTIPLIER_BPS.
 pub fn become_king(ctx: Context<BecomeKing>, multiplier_bps: u64) -> Result<()> {
     let clock = Clock::get()?;
     let game = &mut ctx.accounts.game_state;
@@ -53,9 +49,17 @@ pub fn become_king(ctx: Context<BecomeKing>, multiplier_bps: u64) -> Result<()> 
         HigherError::InvalidMultiplier
     );
 
+    // Check if the game has expired (timer started and ran out)
+    let is_expired = game.end_time > 0 && clock.unix_timestamp >= game.end_time;
+
+    if is_expired {
+        return err!(HigherError::GameOver);
+    }
+
+    // After potential reset, determine if this is the first king of the round
     let is_first_king = game.current_king == Pubkey::default();
 
-    // If not the first king, check that the timer hasn't expired
+    // If not the first king, timer must still be running
     if !is_first_king {
         require!(clock.unix_timestamp < game.end_time, HigherError::GameOver);
     }

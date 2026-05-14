@@ -19,4 +19,15 @@ pub struct GameState {
     pub bump: u8, // 1
     /// Bump seed for vault PDA
     pub vault_bump: u8, // 1
+    /// Last 5 winners (newest at index 0)
+    pub recent_winners: [WinnerRecord; 5], // 5 * (32 + 8 + 4) = 220
+    /// Current round number (starts at 0)
+    pub round_number: u32, // 4
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Default, InitSpace)]
+pub struct WinnerRecord {
+    pub address: Pubkey, // 32
+    pub prize: u64, // 8
+    pub round_number: u32, // 4
 }

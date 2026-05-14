@@ -24,11 +24,14 @@ export const HIGHER_ERROR__NOT_KING = 0x1772; // 6002
 export const HIGHER_ERROR__GAME_NOT_ACTIVE = 0x1773; // 6003
 /** Overflow: Arithmetic overflow */
 export const HIGHER_ERROR__OVERFLOW = 0x1774; // 6004
+/** InvalidMultiplier: Multiplier must be between 1.25x and 3x */
+export const HIGHER_ERROR__INVALID_MULTIPLIER = 0x1775; // 6005
 
 export type HigherError =
   | typeof HIGHER_ERROR__GAME_NOT_ACTIVE
   | typeof HIGHER_ERROR__GAME_NOT_OVER
   | typeof HIGHER_ERROR__GAME_OVER
+  | typeof HIGHER_ERROR__INVALID_MULTIPLIER
   | typeof HIGHER_ERROR__NOT_KING
   | typeof HIGHER_ERROR__OVERFLOW;
 
@@ -38,6 +41,7 @@ if (process.env.NODE_ENV !== "production") {
     [HIGHER_ERROR__GAME_NOT_ACTIVE]: `The game is not currently active`,
     [HIGHER_ERROR__GAME_NOT_OVER]: `The game timer has not expired yet`,
     [HIGHER_ERROR__GAME_OVER]: `The game timer has expired`,
+    [HIGHER_ERROR__INVALID_MULTIPLIER]: `Multiplier must be between 1.25x and 3x`,
     [HIGHER_ERROR__NOT_KING]: `Only the current king can claim the prize`,
     [HIGHER_ERROR__OVERFLOW]: `Arithmetic overflow`,
   };
