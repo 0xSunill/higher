@@ -70,7 +70,7 @@ pub fn claim_prize(ctx: Context<ClaimPrize>) -> Result<()> {
     game.current_king = Pubkey::default();
     game.current_price = STARTING_PRICE;
     game.pot_amount = 0;
-    game.end_time = clock.unix_timestamp + INITIAL_DURATION;
+    game.end_time = 0; // Timer not started — starts on next become_king
     // game_active remains true – new round starts automatically
 
     msg!("Prize of {} lamports claimed!", prize);

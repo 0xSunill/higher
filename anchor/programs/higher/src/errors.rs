@@ -12,4 +12,6 @@ pub enum HigherError {
     GameNotActive,
     #[msg("Arithmetic overflow")]
     Overflow,
+    #[msg("Multiplier must be between 1.25x and 3x")]
+    InvalidMultiplier,
 }

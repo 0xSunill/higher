@@ -43,9 +43,12 @@ mod tests {
         }
     }
 
-    fn create_become_king_ix(player: &Pubkey) -> Instruction {
+    fn create_become_king_ix(player: &Pubkey, multiplier_bps: u64) -> Instruction {
         let (game_state_pda, _) = get_game_state_pda();
         let (vault_pda, _) = get_vault_pda();
+
+        let mut data = DISC_BECOME_KING.to_vec();
+        data.extend_from_slice(&multiplier_bps.to_le_bytes());
 
         Instruction {
             program_id: PROGRAM_ID,
@@ -55,7 +58,7 @@ mod tests {
                 AccountMeta::new(vault_pda, false),
                 AccountMeta::new_readonly(system_program::ID, false),
             ],
-            data: DISC_BECOME_KING.to_vec(),
+            data,
         }
     }
 
@@ -169,7 +172,7 @@ mod tests {
         svm.airdrop(&player.pubkey(), 10 * LAMPORTS_PER_SOL)
             .unwrap();
 
-        let ix = create_become_king_ix(&player.pubkey());
+        let ix = create_become_king_ix(&player.pubkey(), 12500); // 1.25x multiplier
         let blockhash = svm.latest_blockhash();
         let tx = Transaction::new_signed_with_payer(
             &[ix],
@@ -196,8 +199,8 @@ mod tests {
 
         assert_eq!(current_king, player.pubkey());
         assert_eq!(pot_amount, STARTING_PRICE);
-        // Price should increase 20%: 10_000_000 * 1.2 = 12_000_000
-        assert_eq!(current_price, 12_000_000);
+        // Price should increase 1.25x: 10_000_000 * 1.25 = 12_500_000
+        assert_eq!(current_price, 12_500_000);
 
         // Verify vault has funds
         let (vault_pda, _) = get_vault_pda();
@@ -232,7 +235,7 @@ mod tests {
         svm.airdrop(&player1.pubkey(), 10 * LAMPORTS_PER_SOL)
             .unwrap();
 
-        let ix = create_become_king_ix(&player1.pubkey());
+        let ix = create_become_king_ix(&player1.pubkey(), 12500); // 1.25x multiplier
         let blockhash = svm.latest_blockhash();
         let tx = Transaction::new_signed_with_payer(
             &[ix],
@@ -247,7 +250,7 @@ mod tests {
         svm.airdrop(&player2.pubkey(), 10 * LAMPORTS_PER_SOL)
             .unwrap();
 
-        let ix = create_become_king_ix(&player2.pubkey());
+        let ix = create_become_king_ix(&player2.pubkey(), 12500); // 1.25x multiplier
         let blockhash = svm.latest_blockhash();
         let tx = Transaction::new_signed_with_payer(
             &[ix],
@@ -267,10 +270,10 @@ mod tests {
         let pot_amount = read_u64(data, 72);
 
         assert_eq!(current_king, player2.pubkey());
-        // Total pot: 10_000_000 + 12_000_000 = 22_000_000
-        assert_eq!(pot_amount, 22_000_000);
-        // Price after second king: 12_000_000 * 1.2 = 14_400_000
-        assert_eq!(current_price, 14_400_000);
+        // Total pot: 10_000_000 + 12_500_000 = 22_500_000
+        assert_eq!(pot_amount, 22_500_000);
+        // Price after second king: 12_500_000 * 1.25 = 15_625_000
+        assert_eq!(current_price, 15_625_000);
     }
 
     #[test]
@@ -300,7 +303,7 @@ mod tests {
         svm.airdrop(&player.pubkey(), 10 * LAMPORTS_PER_SOL)
             .unwrap();
 
-        let ix = create_become_king_ix(&player.pubkey());
+        let ix = create_become_king_ix(&player.pubkey(), 12500); // 1.25x multiplier
         let blockhash = svm.latest_blockhash();
         let tx = Transaction::new_signed_with_payer(
             &[ix],
@@ -351,7 +354,7 @@ mod tests {
         svm.airdrop(&player1.pubkey(), 10 * LAMPORTS_PER_SOL)
             .unwrap();
 
-        let ix = create_become_king_ix(&player1.pubkey());
+        let ix = create_become_king_ix(&player1.pubkey(), 12500); // 1.25x multiplier
         let blockhash = svm.latest_blockhash();
         let tx = Transaction::new_signed_with_payer(
             &[ix],

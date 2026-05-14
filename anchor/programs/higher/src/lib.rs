@@ -22,8 +22,9 @@ pub mod higher {
     }
 
     /// Pay SOL to become the new King of the Hill.
-    pub fn become_king(ctx: Context<BecomeKing>) -> Result<()> {
-        instructions::become_king::become_king(ctx)
+    /// `multiplier_bps` controls the price increase (12500 = 1.25x, 30000 = 3x).
+    pub fn become_king(ctx: Context<BecomeKing>, multiplier_bps: u64) -> Result<()> {
+        instructions::become_king::become_king(ctx, multiplier_bps)
     }
 
     /// Claim the prize pot after the timer expires.

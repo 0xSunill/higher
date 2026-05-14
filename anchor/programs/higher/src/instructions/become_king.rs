@@ -32,23 +32,33 @@ pub struct BecomeKing<'info> {
 ///
 /// Requirements:
 /// - Game must be active
-/// - Timer must not have expired
-/// - User must pay exactly `current_price`
+/// - Timer must not have expired (unless no king yet — first king starts the timer)
+/// - `multiplier_bps` must be between MIN_MULTIPLIER_BPS and MAX_MULTIPLIER_BPS
 ///
 /// Effects:
 /// - SOL transferred to vault PDA
 /// - Caller recorded as new king
-/// - Price increases by 20%
+/// - Price increases by chosen multiplier
 /// - Timer reset logic with anti-sniping
-pub fn become_king(ctx: Context<BecomeKing>) -> Result<()> {
+pub fn become_king(ctx: Context<BecomeKing>, multiplier_bps: u64) -> Result<()> {
     let clock = Clock::get()?;
     let game = &mut ctx.accounts.game_state;
 
     // Ensure game is active
     require!(game.game_active, HigherError::GameNotActive);
 
-    // Ensure the timer has not expired
-    require!(clock.unix_timestamp < game.end_time, HigherError::GameOver);
+    // Validate multiplier is within bounds
+    require!(
+        multiplier_bps >= MIN_MULTIPLIER_BPS && multiplier_bps <= MAX_MULTIPLIER_BPS,
+        HigherError::InvalidMultiplier
+    );
+
+    let is_first_king = game.current_king == Pubkey::default();
+
+    // If not the first king, check that the timer hasn't expired
+    if !is_first_king {
+        require!(clock.unix_timestamp < game.end_time, HigherError::GameOver);
+    }
 
     let price = game.current_price;
 
@@ -71,21 +81,27 @@ pub fn become_king(ctx: Context<BecomeKing>) -> Result<()> {
         .checked_add(price)
         .ok_or(HigherError::Overflow)?;
 
-    // Increase price by 20%
+    // Increase price by the chosen multiplier
+    // new_price = price * multiplier_bps / 10000
     game.current_price = price
-        .checked_mul(10_000 + PRICE_INCREASE_BPS)
+        .checked_mul(multiplier_bps)
         .ok_or(HigherError::Overflow)?
         .checked_div(10_000)
         .ok_or(HigherError::Overflow)?;
 
-    // Anti-sniping timer logic
-    let time_remaining = game.end_time - clock.unix_timestamp;
-    if time_remaining < ANTI_SNIPE_THRESHOLD {
-        // Less than threshold remaining → extend by anti-snipe extension
-        game.end_time = clock.unix_timestamp + ANTI_SNIPE_EXTENSION;
-    } else {
-        // Otherwise reset to initial duration from now
+    if is_first_king {
+        // First king — start the timer
         game.end_time = clock.unix_timestamp + INITIAL_DURATION;
+    } else {
+        // Anti-sniping timer logic
+        let time_remaining = game.end_time - clock.unix_timestamp;
+        if time_remaining < ANTI_SNIPE_THRESHOLD {
+            // Less than threshold remaining → extend by anti-snipe extension
+            game.end_time = clock.unix_timestamp + ANTI_SNIPE_EXTENSION;
+        } else {
+            // Otherwise reset to initial duration from now
+            game.end_time = clock.unix_timestamp + INITIAL_DURATION;
+        }
     }
 
     msg!("New King: {}", ctx.accounts.player.key());

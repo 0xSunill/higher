@@ -21,9 +21,9 @@ export default function Home() {
             King of the Hill on Solana
           </p>
           <p className="max-w-xl mx-auto text-sm leading-relaxed text-muted">
-            Pay SOL to become the reigning King. Each new King raises the price
-            by 20%. When the timer expires, the last King standing claims the
-            entire pot.
+            Pay SOL to become the reigning King. Choose your multiplier (1.25x–3x)
+            to set the next price. When the timer expires, the last King standing
+            claims the entire pot.
           </p>
         </header>
 

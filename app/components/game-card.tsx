@@ -17,15 +17,29 @@ import {
     type GameState,
 } from "../generated/higher/accounts";
 import {
-    getBecomeKingInstructionDataEncoder,
+    BECOME_KING_DISCRIMINATOR,
+} from "../generated/higher/instructions/becomeKing";
+import {
     getClaimPrizeInstructionDataEncoder,
+} from "../generated/higher/instructions/claimPrize";
+import {
     getInitializeGameInstructionDataEncoder,
-} from "../generated/higher/instructions";
+} from "../generated/higher/instructions/initializeGame";
 import { HIGHER_PROGRAM_ADDRESS } from "../generated/higher/programs";
 
 const LAMPORTS_PER_SOL = 1_000_000_000n;
 const SYSTEM_PROGRAM_ADDRESS = "11111111111111111111111111111111" as Address;
 const DEFAULT_PUBKEY = "11111111111111111111111111111111";
+
+// Multiplier options for the user
+const MULTIPLIER_OPTIONS = [
+    { label: "1.25x", bps: 12500 },
+    { label: "1.5x", bps: 15000 },
+    { label: "1.75x", bps: 17500 },
+    { label: "2x", bps: 20000 },
+    { label: "2.5x", bps: 25000 },
+    { label: "3x", bps: 30000 },
+];
 
 // RPC for fetching account data
 const rpc = createSolanaRpc("https://api.devnet.solana.com");
@@ -52,6 +66,19 @@ function formatCountdown(seconds: number): string {
     return parts.join(" ");
 }
 
+/**
+ * Encode the become_king instruction data with the multiplier_bps argument.
+ * Layout: [8-byte discriminator][8-byte u64 multiplier_bps (little-endian)]
+ */
+function encodeBecomeKingData(multiplierBps: number): Uint8Array {
+    const data = new Uint8Array(16); // 8 discriminator + 8 u64
+    data.set(BECOME_KING_DISCRIMINATOR, 0);
+    // Encode u64 as little-endian
+    const view = new DataView(data.buffer);
+    view.setBigUint64(8, BigInt(multiplierBps), true); // little-endian
+    return data;
+}
+
 export function GameCard() {
     const { wallet, status } = useWalletConnection();
     const { send, isSending } = useSendTransaction();
@@ -63,6 +90,7 @@ export function GameCard() {
     const [txStatus, setTxStatus] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [gameExists, setGameExists] = useState(true);
+    const [selectedMultiplier, setSelectedMultiplier] = useState(MULTIPLIER_OPTIONS[0]);
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const walletAddress = wallet?.account.address;
@@ -120,9 +148,17 @@ export function GameCard() {
         return () => clearInterval(interval);
     }, [fetchGameState]);
 
+    // Determine if the timer has started (end_time > 0 means timer is running)
+    const hasKing =
+        gameState?.currentKing && gameState.currentKing !== DEFAULT_PUBKEY;
+    const timerStarted = gameState ? Number(gameState.endTime) > 0 : false;
+
     // Live countdown timer
     useEffect(() => {
-        if (!gameState) return;
+        if (!gameState || !timerStarted) {
+            setCountdown(0);
+            return;
+        }
 
         const updateCountdown = () => {
             const now = Math.floor(Date.now() / 1000);
@@ -136,15 +172,13 @@ export function GameCard() {
         return () => {
             if (intervalRef.current) clearInterval(intervalRef.current);
         };
-    }, [gameState]);
+    }, [gameState, timerStarted]);
 
     const isKing =
         walletAddress && gameState
             ? walletAddress === gameState.currentKing
             : false;
-    const hasKing =
-        gameState?.currentKing && gameState.currentKing !== DEFAULT_PUBKEY;
-    const isExpired = countdown === 0 && gameState !== null;
+    const isExpired = timerStarted && countdown === 0 && gameState !== null;
 
     // Initialize game
     const handleInitialize = useCallback(async () => {
@@ -173,11 +207,11 @@ export function GameCard() {
         }
     }, [walletAddress, gameStatePda, vaultPda, send, fetchGameState]);
 
-    // Become king
+    // Become king with selected multiplier
     const handleBecomeKing = useCallback(async () => {
         if (!walletAddress || !gameStatePda || !vaultPda) return;
         try {
-            setTxStatus("Building transaction...");
+            setTxStatus(`Building transaction (${selectedMultiplier.label} multiplier)...`);
             const instruction = {
                 programAddress: HIGHER_PROGRAM_ADDRESS,
                 accounts: [
@@ -186,7 +220,7 @@ export function GameCard() {
                     { address: vaultPda, role: 1 as const }, // Writable
                     { address: SYSTEM_PROGRAM_ADDRESS, role: 0 as const }, // Readonly
                 ],
-                data: getBecomeKingInstructionDataEncoder().encode({}),
+                data: encodeBecomeKingData(selectedMultiplier.bps),
             };
             setTxStatus("Awaiting signature...");
             const signature = await send({ instructions: [instruction] });
@@ -198,7 +232,7 @@ export function GameCard() {
                 `Error: ${err instanceof Error ? err.message : "Unknown error"}`
             );
         }
-    }, [walletAddress, gameStatePda, vaultPda, send, fetchGameState]);
+    }, [walletAddress, gameStatePda, vaultPda, send, fetchGameState, selectedMultiplier]);
 
     // Claim prize
     const handleClaimPrize = useCallback(async () => {
@@ -226,6 +260,11 @@ export function GameCard() {
             );
         }
     }, [walletAddress, gameStatePda, vaultPda, send, fetchGameState]);
+
+    // Compute next price based on selected multiplier
+    const nextPrice = gameState
+        ? (gameState.currentPrice * BigInt(selectedMultiplier.bps)) / 10000n
+        : 0n;
 
     if (loading) {
         return (
@@ -320,25 +359,38 @@ export function GameCard() {
                     <p className="text-[10px] uppercase tracking-[0.15em] text-muted mb-1">
                         Time Left
                     </p>
-                    <p
-                        className={`text-2xl font-bold tabular-nums font-mono ${isExpired
-                            ? "text-red-400"
-                            : countdown < 600
-                                ? "text-orange-400 animate-countdown-pulse"
-                                : "text-foreground"
-                            }`}
-                    >
-                        {formatCountdown(countdown)}
-                    </p>
-                    {countdown > 0 && countdown < 600 && (
-                        <p className="text-[10px] text-orange-400 mt-0.5">⚡ Anti-Snipe Zone</p>
+                    {!timerStarted ? (
+                        <>
+                            <p className="text-2xl font-bold tabular-nums font-mono text-muted">
+                                --:--
+                            </p>
+                            <p className="text-[10px] text-muted mt-0.5">
+                                Waiting for first King
+                            </p>
+                        </>
+                    ) : (
+                        <>
+                            <p
+                                className={`text-2xl font-bold tabular-nums font-mono ${isExpired
+                                    ? "text-red-400"
+                                    : countdown < 60
+                                        ? "text-orange-400 animate-countdown-pulse"
+                                        : "text-foreground"
+                                    }`}
+                            >
+                                {formatCountdown(countdown)}
+                            </p>
+                            {countdown > 0 && countdown < 60 && (
+                                <p className="text-[10px] text-orange-400 mt-0.5">⚡ Anti-Snipe Zone</p>
+                            )}
+                        </>
                     )}
                 </div>
 
-                {/* Next Price */}
+                {/* Current Price */}
                 <div className="rounded-xl border border-border-low bg-card p-4 text-center">
                     <p className="text-[10px] uppercase tracking-[0.15em] text-muted mb-1">
-                        Next Price
+                        Current Price
                     </p>
                     <p className="text-2xl font-bold tabular-nums text-gold-gradient">
                         {formatSol(gameState.currentPrice)}
@@ -371,15 +423,65 @@ export function GameCard() {
                         </p>
                     </div>
                 ) : (
-                    <button
-                        onClick={handleBecomeKing}
-                        disabled={isSending}
-                        className="btn-gold w-full rounded-xl px-6 py-4 text-lg tracking-wide"
-                    >
-                        {isSending
-                            ? "Confirming..."
-                            : `🚀 Go Higher — ${formatSol(gameState.currentPrice)} SOL`}
-                    </button>
+                    <>
+                        {/* Multiplier Selection */}
+                        <div>
+                            <p className="text-xs uppercase tracking-[0.15em] text-muted mb-3 font-semibold">
+                                Choose your multiplier
+                            </p>
+                            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                                {MULTIPLIER_OPTIONS.map((option) => (
+                                    <button
+                                        key={option.bps}
+                                        onClick={() => setSelectedMultiplier(option)}
+                                        className={`relative rounded-lg px-3 py-2.5 text-sm font-bold transition-all duration-200 cursor-pointer
+                                            ${selectedMultiplier.bps === option.bps
+                                                ? "bg-primary/20 text-primary border-2 border-primary shadow-[0_0_20px_-5px_rgba(255,215,0,0.3)] scale-105"
+                                                : "bg-card border border-border-low text-muted hover:border-primary/30 hover:text-foreground hover:-translate-y-0.5"
+                                            }`}
+                                    >
+                                        {option.label}
+                                        {selectedMultiplier.bps === option.bps && (
+                                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-primary" />
+                                            </span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Price Preview */}
+                        <div className="rounded-lg border border-border-low bg-cream/30 px-4 py-3 flex items-center justify-between">
+                            <div>
+                                <p className="text-[10px] uppercase tracking-[0.15em] text-muted">You pay</p>
+                                <p className="text-lg font-bold text-gold-gradient">
+                                    {formatSol(gameState.currentPrice)} SOL
+                                </p>
+                            </div>
+                            <div className="text-2xl text-muted">→</div>
+                            <div className="text-right">
+                                <p className="text-[10px] uppercase tracking-[0.15em] text-muted">Next price becomes</p>
+                                <p className="text-lg font-bold text-gold-gradient">
+                                    {formatSol(nextPrice)} SOL
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Go Higher Button */}
+                        <button
+                            onClick={handleBecomeKing}
+                            disabled={isSending}
+                            className="btn-gold w-full rounded-xl px-6 py-4 text-lg tracking-wide"
+                        >
+                            {isSending
+                                ? "Confirming..."
+                                : hasKing
+                                    ? `🚀 Go Higher — ${formatSol(gameState.currentPrice)} SOL`
+                                    : `👑 Become First King — ${formatSol(gameState.currentPrice)} SOL`}
+                        </button>
+                    </>
                 )}
 
                 {/* Transaction Status */}
@@ -402,11 +504,11 @@ export function GameCard() {
                     </div>
                     <div className="flex gap-2 items-start">
                         <span className="text-primary">▸</span>
-                        <span>Price increases 20% each time</span>
+                        <span>Choose your multiplier (1.25x – 3x)</span>
                     </div>
                     <div className="flex gap-2 items-start">
                         <span className="text-primary">▸</span>
-                        <span>Timer resets to 1hr (or 10min if &lt;10min left)</span>
+                        <span>Timer starts when first King is crowned (2 min)</span>
                     </div>
                     <div className="flex gap-2 items-start">
                         <span className="text-primary">▸</span>
