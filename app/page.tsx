@@ -8,6 +8,18 @@ export default function Home() {
 
   const address = wallet?.account.address.toString();
 
+
+
+//dev wallet 2.47357
+//main 2.46565 
+
+
+
+// main staring -
+// dev stariring 
+
+
+
   return (
     <div className="relative min-h-screen overflow-x-clip text-foreground">
       <main className="relative z-10 mx-auto flex min-h-screen max-w-3xl flex-col gap-8 px-4 sm:px-6 py-12">

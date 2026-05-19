@@ -17,6 +17,7 @@ import {
     type GameState,
 } from "../generated/higher/accounts";
 import {
+    getBecomeKingInstructionDataEncoder,
     getClaimPrizeInstructionDataEncoder,
     getInitializeGameInstructionDataEncoder,
 } from "../generated/higher/instructions";
@@ -40,16 +41,6 @@ const MULTIPLIER_OPTIONS = [
     { label: "2.5x", bps: 25000, multiplier: 2.5 },
     { label: "3.0x", bps: 30000, multiplier: 3.0 },
 ];
-
-const BECOME_KING_DISCRIMINATOR = new Uint8Array([54, 30, 2, 33, 246, 219, 137, 24]);
-
-function encodeBecomeKingData(multiplierBps: number): Uint8Array {
-    const data = new Uint8Array(16);
-    data.set(BECOME_KING_DISCRIMINATOR, 0);
-    const view = new DataView(data.buffer);
-    view.setBigUint64(8, BigInt(multiplierBps), true);
-    return data;
-}
 
 export function GameCard() {
     const { wallet, status } = useWalletConnection();
@@ -168,7 +159,7 @@ export function GameCard() {
                     { address: vaultPda, role: 1 as const },
                     { address: SYSTEM_PROGRAM_ADDRESS, role: 0 as const },
                 ],
-                data: encodeBecomeKingData(selectedMultiplier.bps),
+                data: getBecomeKingInstructionDataEncoder().encode({ multiplierBps: selectedMultiplier.bps }),
             };
             setTxStatus("Awaiting signature...");
             const signature = await send({ instructions: [instruction] });
@@ -229,7 +220,7 @@ export function GameCard() {
                     { address: vaultPda, role: 1 as const },
                     { address: SYSTEM_PROGRAM_ADDRESS, role: 0 as const },
                 ],
-                data: encodeBecomeKingData(selectedMultiplier.bps),
+                data: getBecomeKingInstructionDataEncoder().encode({ multiplierBps: selectedMultiplier.bps }),
             };
 
             setTxStatus("Awaiting signature...");
