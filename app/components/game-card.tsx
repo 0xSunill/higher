@@ -25,6 +25,7 @@ import { GameHeader } from "./game/game-header";
 import { GameControls } from "./game/game-controls";
 import { PreviousWinners } from "./game/previous-winners";
 import { HowItWorks } from "./game/how-it-works";
+import { extractSolanaErrorMessage } from "./game/tx-error";
 
 const HIGHER_PROGRAM_ADDRESS = "hiHQCBK7yUu6KNp5sN9yNrrKFcirokX1act8B1HnTH7" as Address;
 const SYSTEM_PROGRAM_ADDRESS = "11111111111111111111111111111111" as Address;
@@ -143,7 +144,7 @@ export function GameCard() {
             setTimeout(fetchGameState, 2000);
         } catch (err) {
             console.error("Initialize failed:", err);
-            setTxStatus(`Error: ${err instanceof Error ? err.message : "Unknown error"}`);
+            setTxStatus(`Error: ${extractSolanaErrorMessage(err)}`);
         }
     }, [walletAddress, gameStatePda, vaultPda, send, fetchGameState]);
 
@@ -167,7 +168,7 @@ export function GameCard() {
             setTimeout(fetchGameState, 2000);
         } catch (err) {
             console.error("Become king failed:", err);
-            setTxStatus(`Error: ${err instanceof Error ? err.message : "Unknown error"}`);
+            setTxStatus(`Error: ${extractSolanaErrorMessage(err)}`);
         }
     }, [walletAddress, gameStatePda, vaultPda, send, fetchGameState, selectedMultiplier]);
 
@@ -192,7 +193,7 @@ export function GameCard() {
             setTimeout(fetchGameState, 2000);
         } catch (err) {
             console.error("Claim prize failed:", err);
-            setTxStatus(`Error: ${err instanceof Error ? err.message : "Unknown error"}`);
+            setTxStatus(`Error: ${extractSolanaErrorMessage(err)}`);
         }
     }, [walletAddress, gameStatePda, vaultPda, gameState, send, fetchGameState]);
 
@@ -230,7 +231,7 @@ export function GameCard() {
             setTimeout(fetchGameState, 2000);
         } catch (err) {
             console.error("Start new round failed:", err);
-            setTxStatus(`Error: ${err instanceof Error ? err.message : "Unknown error"}`);
+            setTxStatus(`Error: ${extractSolanaErrorMessage(err)}`);
         }
     }, [walletAddress, gameStatePda, vaultPda, gameState, send, fetchGameState, selectedMultiplier]);
 
