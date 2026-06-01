@@ -55,6 +55,8 @@ export function GameCard() {
     const [loading, setLoading] = useState(true);
     const [gameExists, setGameExists] = useState(true);
     const [selectedMultiplier, setSelectedMultiplier] = useState(MULTIPLIER_OPTIONS[0]);
+    const selectedMultiplierRef = useRef(selectedMultiplier);
+    selectedMultiplierRef.current = selectedMultiplier;
     const [showWinnerDetails, setShowWinnerDetails] = useState(false);
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -160,7 +162,7 @@ export function GameCard() {
                     { address: vaultPda, role: 1 as const },
                     { address: SYSTEM_PROGRAM_ADDRESS, role: 0 as const },
                 ],
-                data: getBecomeKingInstructionDataEncoder().encode({ multiplierBps: selectedMultiplier.bps }),
+                data: getBecomeKingInstructionDataEncoder().encode({ multiplierBps: selectedMultiplierRef.current.bps }),
             };
             setTxStatus("Awaiting signature...");
             const signature = await send({ instructions: [instruction] });
@@ -170,7 +172,7 @@ export function GameCard() {
             console.error("Become king failed:", err);
             setTxStatus(`Error: ${extractSolanaErrorMessage(err)}`);
         }
-    }, [walletAddress, gameStatePda, vaultPda, send, fetchGameState, selectedMultiplier]);
+    }, [walletAddress, gameStatePda, vaultPda, send, fetchGameState]);
 
     const handleClaimPrize = useCallback(async () => {
         if (!walletAddress || !gameStatePda || !vaultPda || !gameState) return;
@@ -221,7 +223,7 @@ export function GameCard() {
                     { address: vaultPda, role: 1 as const },
                     { address: SYSTEM_PROGRAM_ADDRESS, role: 0 as const },
                 ],
-                data: getBecomeKingInstructionDataEncoder().encode({ multiplierBps: selectedMultiplier.bps }),
+                data: getBecomeKingInstructionDataEncoder().encode({ multiplierBps: selectedMultiplierRef.current.bps }),
             };
 
             setTxStatus("Awaiting signature...");
@@ -233,7 +235,7 @@ export function GameCard() {
             console.error("Start new round failed:", err);
             setTxStatus(`Error: ${extractSolanaErrorMessage(err)}`);
         }
-    }, [walletAddress, gameStatePda, vaultPda, gameState, send, fetchGameState, selectedMultiplier]);
+    }, [walletAddress, gameStatePda, vaultPda, gameState, send, fetchGameState]);
 
     const nextPrice = gameState
         ? (isExpired ? 10000000n : gameState.currentPrice) * BigInt(selectedMultiplier.bps) / 10000n
