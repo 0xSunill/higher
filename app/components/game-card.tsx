@@ -237,8 +237,16 @@ export function GameCard() {
         }
     }, [walletAddress, gameStatePda, vaultPda, gameState, send, fetchGameState]);
 
-    const nextPrice = gameState
-        ? (isExpired ? 10000000n : gameState.currentPrice) * BigInt(selectedMultiplier.bps) / 10000n
+    // With the new logic: the multiplier affects YOUR payment
+    // First king pays the base currentPrice (0.01 SOL)
+    // Subsequent kings pay currentPrice * multiplier
+    const basePrice = gameState
+        ? (isExpired ? 10000000n : gameState.currentPrice)
+        : 0n;
+    const yourPrice = gameState
+        ? (hasKing && !isExpired
+            ? basePrice * BigInt(selectedMultiplier.bps) / 10000n
+            : basePrice)
         : 0n;
 
     if (loading) {
@@ -295,7 +303,7 @@ export function GameCard() {
                 isSending={isSending}
                 txStatus={txStatus}
                 gameState={gameState}
-                nextPrice={nextPrice}
+                yourPrice={yourPrice}
                 selectedMultiplier={selectedMultiplier}
                 MULTIPLIER_OPTIONS={MULTIPLIER_OPTIONS}
                 setSelectedMultiplier={setSelectedMultiplier}

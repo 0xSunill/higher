@@ -11,7 +11,7 @@ type GameControlsProps = {
     isSending: boolean;
     txStatus: string | null;
     gameState: GameState;
-    nextPrice: bigint;
+    yourPrice: bigint;
     selectedMultiplier: MultiplierOption;
     MULTIPLIER_OPTIONS: MultiplierOption[];
     setSelectedMultiplier: (opt: MultiplierOption) => void;
@@ -28,7 +28,7 @@ export function GameControls({
     isSending,
     txStatus,
     gameState,
-    nextPrice,
+    yourPrice,
     selectedMultiplier,
     MULTIPLIER_OPTIONS,
     setSelectedMultiplier,
@@ -116,13 +116,13 @@ export function GameControls({
                     {/* Price Preview */}
                     <div className="rounded-lg border border-border-low bg-cream/30 px-4 py-3 flex items-center justify-between">
                         <div>
-                            <p className="text-[10px] uppercase tracking-[0.15em] text-muted">You pay</p>
-                            <p className="text-lg font-bold text-gold-gradient">{formatSol(gameState.currentPrice)} SOL</p>
+                            <p className="text-[10px] uppercase tracking-[0.15em] text-muted">Base price</p>
+                            <p className="text-lg font-bold text-muted">{formatSol(gameState.currentPrice)} SOL</p>
                         </div>
-                        <div className="text-2xl text-muted">→</div>
+                        <div className="text-2xl text-muted">×{selectedMultiplier.label.replace('x','')}</div>
                         <div className="text-right">
-                            <p className="text-[10px] uppercase tracking-[0.15em] text-muted">Next price becomes</p>
-                            <p className="text-lg font-bold text-gold-gradient">{formatSol(nextPrice)} SOL</p>
+                            <p className="text-[10px] uppercase tracking-[0.15em] text-muted">You pay</p>
+                            <p className="text-lg font-bold text-gold-gradient">{formatSol(yourPrice)} SOL</p>
                         </div>
                     </div>
 
@@ -130,8 +130,8 @@ export function GameControls({
                         {isSending
                             ? "Confirming..."
                             : hasKing
-                                ? `🚀 Go Higher — ${formatSol(gameState.currentPrice)} SOL`
-                                : `👑 Become First King — ${formatSol(gameState.currentPrice)} SOL`}
+                                ? `🚀 Go Higher — ${formatSol(yourPrice)} SOL`
+                                : `👑 Become First King — ${formatSol(yourPrice)} SOL`}
                     </button>
                 </>
             )}

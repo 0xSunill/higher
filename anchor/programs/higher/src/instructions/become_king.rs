@@ -64,7 +64,19 @@ pub fn become_king(ctx: Context<BecomeKing>, multiplier_bps: u64) -> Result<()> 
         require!(clock.unix_timestamp < game.end_time, HigherError::GameOver);
     }
 
-    let price = game.current_price;
+    // Calculate the price this player pays:
+    // - First king pays the base current_price (fixed at STARTING_PRICE)
+    // - Subsequent kings pay current_price * multiplier_bps / 10000
+    //   (the multiplier affects YOUR OWN payment)
+    let price = if is_first_king {
+        game.current_price
+    } else {
+        game.current_price
+            .checked_mul(multiplier_bps)
+            .ok_or(HigherError::Overflow)?
+            .checked_div(10_000)
+            .ok_or(HigherError::Overflow)?
+    };
 
     // Transfer SOL from player to vault
     transfer(
@@ -85,13 +97,9 @@ pub fn become_king(ctx: Context<BecomeKing>, multiplier_bps: u64) -> Result<()> 
         .checked_add(price)
         .ok_or(HigherError::Overflow)?;
 
-    // Increase price by the chosen multiplier
-    // new_price = price * multiplier_bps / 10000
-    game.current_price = price
-        .checked_mul(multiplier_bps)
-        .ok_or(HigherError::Overflow)?
-        .checked_div(10_000)
-        .ok_or(HigherError::Overflow)?;
+    // The price this player paid becomes the new current_price
+    // (next player's base before their own multiplier is applied)
+    game.current_price = price;
 
     if is_first_king {
         // First king — start the timer
