@@ -17,7 +17,7 @@ export function HowItWorks({ gameState, gameStatePda }: HowItWorksProps) {
                 </div>
                 <div className="flex gap-2 items-start">
                     <span className="text-primary">▸</span>
-                    <span>Choose your multiplier (1.25x – 3x)</span>
+                    <span>Your multiplier (1.25x – 3x) sets your price</span>
                 </div>
                 <div className="flex gap-2 items-start">
                     <span className="text-primary">▸</span>

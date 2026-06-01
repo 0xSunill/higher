@@ -1,10 +1,13 @@
 "use client";
+import { useState } from "react";
 import { useWalletConnection } from "@solana/react-hooks";
 import { GameCard } from "./components/game-card";
+import { RulesModal, RulesButton } from "./components/game/rules-modal";
 
 export default function Home() {
   const { connectors, connect, disconnect, wallet, status } =
     useWalletConnection();
+  const [showRules, setShowRules] = useState(false);
 
   const address = wallet?.account.address.toString();
 
@@ -34,10 +37,16 @@ export default function Home() {
           </p>
           <p className="max-w-xl mx-auto text-sm leading-relaxed text-muted">
             Pay SOL to become the reigning King. Choose your multiplier (1.25x–3x)
-            to set the next price. When the timer expires, the last King standing
+            to set your price. When the timer expires, the last King standing
             claims the entire pot.
           </p>
+          <div className="pt-2">
+            <RulesButton onClick={() => setShowRules(true)} />
+          </div>
         </header>
+
+        {/* Rules Modal */}
+        <RulesModal isOpen={showRules} onClose={() => setShowRules(false)} />
 
         {/* Wallet Connection */}
         <section className="w-full max-w-2xl mx-auto rounded-2xl border border-border-low bg-card p-5 shadow-[0_20px_60px_-40px_rgba(255,215,0,0.08)]">
