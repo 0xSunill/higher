@@ -3,6 +3,7 @@ import { formatAddress, formatSol } from "./utils";
 
 
 const DEFAULT_PUBKEY = "11111111111111111111111111111111";
+const MAX_WINNERS_SHOWN = 3;
 
 type PreviousWinnersProps = {
     gameState: GameState;
@@ -12,7 +13,16 @@ type PreviousWinnersProps = {
 };
 
 export function PreviousWinners({ gameState, hasLastWinner, showWinnerDetails, setShowWinnerDetails }: PreviousWinnersProps) {
-    if (!hasLastWinner || !gameState) return null;
+    if (!gameState) return null;
+
+    // Filter out empty/default slots and take only the last 3 valid winners
+    const validWinners = gameState.recentWinners
+        .filter(w => w.address !== DEFAULT_PUBKEY)
+        .slice(0, MAX_WINNERS_SHOWN);
+
+    if (validWinners.length === 0) return null;
+
+    const latestWinner = validWinners[0];
 
     return (
         <div className="rounded-2xl border border-border-low bg-card overflow-hidden">
@@ -23,14 +33,17 @@ export function PreviousWinners({ gameState, hasLastWinner, showWinnerDetails, s
                 <div className="flex items-center gap-3">
                     <span className="text-2xl">🏆</span>
                     <div className="text-left">
-                        <p className="text-xs uppercase tracking-[0.15em] text-muted font-semibold">Previous Winners</p>
+                        <p className="text-xs uppercase tracking-[0.15em] text-muted font-semibold">
+                            Previous Winners
+                            <span className="ml-2 inline-flex items-center justify-center px-1.5 py-0.5 rounded-full bg-primary/15 text-primary text-[10px] font-bold">{validWinners.length}</span>
+                        </p>
                         <p className="text-sm font-bold font-mono text-gold-gradient">
-                            {formatAddress(gameState.recentWinners[0].address)}
+                            {formatAddress(latestWinner.address)}
                         </p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-gold-gradient">{formatSol(gameState.recentWinners[0].prize)} SOL</span>
+                    <span className="text-sm font-bold text-gold-gradient">{formatSol(latestWinner.prize)} SOL</span>
                     <span className={`text-muted transition-transform duration-200 ${showWinnerDetails ? "rotate-180" : ""}`}>
                         ▼
                     </span>
@@ -39,7 +52,7 @@ export function PreviousWinners({ gameState, hasLastWinner, showWinnerDetails, s
 
             {showWinnerDetails && (
                 <div className="border-t border-border-low divide-y divide-border-low animate-[fadeIn_0.2s_ease-out]">
-                    {gameState.recentWinners.filter(w => w.address !== DEFAULT_PUBKEY).map((winner, idx) => (
+                    {validWinners.map((winner, idx) => (
                         <div key={idx} className="px-5 py-3 flex items-center justify-between hover:bg-cream/5">
                             <div className="flex items-center gap-3">
                                 <span className="text-muted text-xs">Round {winner.roundNumber}</span>

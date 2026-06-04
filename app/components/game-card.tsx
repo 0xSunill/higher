@@ -142,7 +142,7 @@ export function GameCard() {
             };
             setTxStatus("Awaiting signature...");
             const signature = await send({ instructions: [instruction] });
-            setTxStatus(`Game Initialized! Tx: ${signature?.slice(0, 20)}...`);
+            setTxStatus(`Game I nitialized! Tx: ${signature?.slice(0, 20)}...`);
             setTimeout(fetchGameState, 2000);
         } catch (err) {
             console.error("Initialize failed:", err);
