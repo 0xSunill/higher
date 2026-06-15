@@ -16,8 +16,6 @@ pub struct InitializeGame<'info> {
         bump,
     )]
     pub game_state: Account<'info, GameState>,
-
-    /// The vault PDA that holds the pot SOL
     #[account(
         mut,
         seeds = [b"vault_v2"],
@@ -28,12 +26,9 @@ pub struct InitializeGame<'info> {
     pub system_program: Program<'info, System>,
 }
 
-/// Initialize a new King of the Hill game.
-/// Sets starting price and creates the vault.
-/// Timer does NOT start until the first player becomes king.
-pub fn initialize_game(ctx: Context<InitializeGame>) -> Result<()> {
-    let game = &mut ctx.accounts.game_state;
 
+pub fn initialize_game(ctx: Context<InitializeGame>) -> Result<()> {
+    let game = &mut ctx.accounts.game_state;    
     game.authority = ctx.accounts.authority.key();
     game.current_king = Pubkey::default(); // No king yet
     game.current_price = STARTING_PRICE;

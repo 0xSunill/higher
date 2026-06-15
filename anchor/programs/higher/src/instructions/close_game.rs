@@ -9,7 +9,7 @@ pub struct CloseGame<'info> {
 
     #[account(
         mut,
-        seeds = [b"game_state"],
+        seeds = [b"game_state_v2"],
         bump = game_state.bump,
         close = authority,
         constraint = game_state.authority == authority.key(),

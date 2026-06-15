@@ -17,7 +17,6 @@ pub struct BecomeKing<'info> {
     )]
     pub game_state: Account<'info, GameState>,
 
-    /// The vault PDA receiving SOL
     #[account(
         mut,
         seeds = [b"vault_v2"],
@@ -28,46 +27,31 @@ pub struct BecomeKing<'info> {
     pub system_program: Program<'info, System>,
 }
 
-/// Pay SOL to become the new King of the Hill.
-///
-/// Handles three scenarios:
-/// 1. First king (no current king) — starts the timer
-/// 2. Normal play (timer running) — dethrone current king
-/// 3. Expired game (timer ran out, unclaimed) — auto-reset and start new round
-///
-/// The `multiplier_bps` must be between MIN_MULTIPLIER_BPS and MAX_MULTIPLIER_BPS.
+
 pub fn become_king(ctx: Context<BecomeKing>, multiplier_bps: u64) -> Result<()> {
     let clock = Clock::get()?;
     let game = &mut ctx.accounts.game_state;
 
-    // Ensure game is active
     require!(game.game_active, HigherError::GameNotActive);
 
-    // Validate multiplier is within bounds
     require!(
         multiplier_bps >= MIN_MULTIPLIER_BPS && multiplier_bps <= MAX_MULTIPLIER_BPS,
         HigherError::InvalidMultiplier
     );
 
-    // Check if the game has expired (timer started and ran out)
     let is_expired = game.end_time > 0 && clock.unix_timestamp >= game.end_time;
 
     if is_expired {
         return err!(HigherError::GameOver);
     }
 
-    // After potential reset, determine if this is the first king of the round
     let is_first_king = game.current_king == Pubkey::default();
 
-    // If not the first king, timer must still be running
+
     if !is_first_king {
         require!(clock.unix_timestamp < game.end_time, HigherError::GameOver);
     }
 
-    // Calculate the price this player pays:
-    // - First king pays the base current_price (fixed at STARTING_PRICE)
-    // - Subsequent kings pay current_price * multiplier_bps / 10000
-    //   (the multiplier affects YOUR OWN payment)
     let price = if is_first_king {
         game.current_price
     } else {
@@ -78,7 +62,6 @@ pub fn become_king(ctx: Context<BecomeKing>, multiplier_bps: u64) -> Result<()> 
             .ok_or(HigherError::Overflow)?
     };
 
-    // Transfer SOL from player to vault
     transfer(
         CpiContext::new(
             ctx.accounts.system_program.to_account_info(),
@@ -90,22 +73,19 @@ pub fn become_king(ctx: Context<BecomeKing>, multiplier_bps: u64) -> Result<()> 
         price,
     )?;
 
-    // Update game state
     game.current_king = ctx.accounts.player.key();
     game.pot_amount = game
         .pot_amount
         .checked_add(price)
         .ok_or(HigherError::Overflow)?;
 
-    // The price this player paid becomes the new current_price
-    // (next player's base before their own multiplier is applied)
     game.current_price = price;
 
     if is_first_king {
-        // First king — start the timer
+   //first time king time
         game.end_time = clock.unix_timestamp + INITIAL_DURATION;
     } else {
-        // Anti-sniping timer logic
+        //antisnipe
         let time_remaining = game.end_time - clock.unix_timestamp;
         if time_remaining < ANTI_SNIPE_THRESHOLD {
             // Less than threshold remaining → extend by anti-snipe extension

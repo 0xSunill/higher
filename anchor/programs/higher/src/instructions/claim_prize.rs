@@ -20,7 +20,6 @@ pub struct ClaimPrize<'info> {
     )]
     pub game_state: Account<'info, GameState>,
 
-    /// The vault PDA holding the pot
     #[account(
         mut,
         seeds = [b"vault_v2"],
@@ -31,17 +30,14 @@ pub struct ClaimPrize<'info> {
     pub system_program: Program<'info, System>,
 }
 
-/// Claim the prize pot. Callable by anyone after the timer expires,
-/// but the funds will ALWAYS be transferred to the current king.
-/// Resets the game for a new round.
+
 pub fn claim_prize(ctx: Context<ClaimPrize>) -> Result<()> {
     let clock = Clock::get()?;
     let game = &mut ctx.accounts.game_state;
 
-    // Ensure game is active
+
     require!(game.game_active, HigherError::GameNotActive);
 
-    // Anyone can call this, but the lamports MUST go to the actual king
     require!(
         ctx.accounts.king.key() == game.current_king,
         HigherError::NotKing
@@ -49,7 +45,7 @@ pub fn claim_prize(ctx: Context<ClaimPrize>) -> Result<()> {
 
     // Timer must have expired
     require!(
-        clock.unix_timestamp >= game.end_time,
+        clock.unix_timestamp >= game.end_time,  
         HigherError::GameNotOver
     );
 
