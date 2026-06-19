@@ -43,6 +43,8 @@ pub fn claim_prize(ctx: Context<ClaimPrize>) -> Result<()> {
         HigherError::NotKing
     );
 
+    require!(game.current_king != Pubkey::default(), HigherError::GameNotActive);
+
     // Timer must have expired
     require!(
         clock.unix_timestamp >= game.end_time,  

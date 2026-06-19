@@ -30,7 +30,6 @@ pub mod higher {
         instructions::claim_prize::claim_prize(ctx)
     }
 
-    /// Close the game state account (authority only). Used for migration.
     pub fn close_game(ctx: Context<CloseGame>) -> Result<()> {
         instructions::close_game::close_game(ctx)
     }
