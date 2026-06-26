@@ -11,36 +11,33 @@ export default function Home() {
 
   const address = wallet?.account.address.toString();
 
-
-
-//dev wallet 2.47357
-//main 2.46565 
-
-
-
-// main staring -
-// dev stariring 
-
-
-
   return (
     <div className="relative min-h-screen overflow-x-clip text-foreground">
-      <main className="relative z-10 mx-auto flex min-h-screen max-w-3xl flex-col gap-8 px-4 sm:px-6 py-12">
+      {/* Ambient background effects */}
+      <div className="bg-grid" />
+      <div className="bg-orb bg-orb-1" />
+      <div className="bg-orb bg-orb-2" />
+
+      <main className="relative z-10 mx-auto flex min-h-screen max-w-2xl flex-col gap-8 px-4 sm:px-6 py-16">
         {/* Header */}
-        <header className="text-center space-y-3">
-          <div className="text-5xl mb-2">👑</div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gold-gradient">
-            HIGHER
-          </h1>
-          <p className="text-sm uppercase tracking-[0.2em] text-muted">
-            King of the Hill on Solana
+        <header className="text-center space-y-5 animate-fadeInUp">
+          <div className="inline-flex items-center justify-center">
+            <span className="text-6xl animate-crown-float drop-shadow-[0_0_30px_rgba(245,197,24,0.2)]">👑</span>
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-gold-shimmer">
+              HIGHER
+            </h1>
+            <div className="divider-gold mx-auto w-24 my-3" />
+            <p className="text-xs uppercase tracking-[0.25em] text-muted font-medium">
+              King of the Hill on Solana
+            </p>
+          </div>
+          <p className="max-w-md mx-auto text-sm leading-relaxed text-muted/80">
+            Pay SOL to become the reigning King. Choose your multiplier to set your price.
+            When the timer expires, the last King standing claims the entire pot.
           </p>
-          <p className="max-w-xl mx-auto text-sm leading-relaxed text-muted">
-            Pay SOL to become the reigning King. Choose your multiplier (1.25x–3x)
-            to set your price. When the timer expires, the last King standing
-            claims the entire pot.
-          </p>
-          <div className="pt-2">
+          <div className="pt-1 flex items-center justify-center gap-3">
             <RulesButton onClick={() => setShowRules(true)} />
           </div>
         </header>
@@ -49,37 +46,34 @@ export default function Home() {
         <RulesModal isOpen={showRules} onClose={() => setShowRules(false)} />
 
         {/* Wallet Connection */}
-        <section className="w-full max-w-2xl mx-auto rounded-2xl border border-border-low bg-card p-5 shadow-[0_20px_60px_-40px_rgba(255,215,0,0.08)]">
+        <section className="w-full glass-card rounded-2xl p-5 animate-fadeInUp stagger-1">
           <div className="flex items-center justify-between gap-4 mb-4">
             <div>
               <p className="text-sm font-semibold">Wallet</p>
               <p className="text-xs text-muted">
                 {status === "connected"
-                  ? "Connected to Solana testnet"
+                  ? "Connected to Solana devnet"
                   : "Connect a wallet to play"}
               </p>
             </div>
             <span
-              className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${status === "connected"
-                  ? "bg-green-500/15 text-green-400"
-                  : "bg-red-500/10 text-red-400"
-                }`}
+              className={`status-badge ${status === "connected" ? "status-badge-live" : "status-badge-offline"}`}
             >
-              {status === "connected" ? "● Live" : "○ Offline"}
+              {status === "connected" ? "Live" : "Offline"}
             </span>
           </div>
 
           {status !== "connected" ? (
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-2.5 sm:grid-cols-2">
               {connectors.map((connector) => (
                 <button
                   key={connector.id}
                   onClick={() => connect(connector.id)}
                   disabled={status === "connecting"}
-                  className="group flex items-center justify-between rounded-xl border border-border-low bg-card px-4 py-3 text-left text-sm font-medium transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_8px_30px_-15px_rgba(255,215,0,0.15)] cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                  className="wallet-connector text-left text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <span className="flex flex-col">
-                    <span className="text-sm">{connector.name}</span>
+                  <span className="flex flex-col gap-0.5">
+                    <span className="text-sm text-foreground">{connector.name}</span>
                     <span className="text-[10px] text-muted">
                       {status === "connecting"
                         ? "Connecting…"
@@ -88,19 +82,21 @@ export default function Home() {
                   </span>
                   <span
                     aria-hidden
-                    className="h-2 w-2 rounded-full bg-border-low transition group-hover:bg-primary/60"
+                    className="h-2.5 w-2.5 rounded-full bg-border-low transition-colors"
+                    style={{ transition: 'all 0.3s' }}
                   />
                 </button>
               ))}
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <span className="flex-1 truncate rounded-lg border border-border-low bg-cream px-3 py-2 font-mono text-xs">
+              <span className="flex-1 truncate rounded-xl border border-border-low bg-surface-0 px-4 py-2.5 font-mono text-xs" style={{ background: 'var(--surface-0)' }}>
                 {address}
               </span>
               <button
                 onClick={() => disconnect()}
-                className="rounded-lg border border-border-low bg-card px-4 py-2 text-xs font-semibold transition hover:-translate-y-0.5 hover:shadow-sm cursor-pointer"
+                className="rounded-xl border border-border-low px-4 py-2.5 text-xs font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500/20 hover:text-red-400 cursor-pointer"
+                style={{ background: 'var(--surface-0)' }}
               >
                 Disconnect
               </button>
@@ -112,9 +108,10 @@ export default function Home() {
         <GameCard />
 
         {/* Footer */}
-        <footer className="text-center pb-8">
-          <p className="text-[10px] text-muted/50 uppercase tracking-[0.15em]">
-            Built on Solana Testnet • Anchor Framework
+        <footer className="text-center pb-8 pt-4">
+          <div className="divider-gold mx-auto w-16 mb-4" />
+          <p className="text-[10px] text-muted/40 uppercase tracking-[0.2em] font-medium">
+            Built on Solana Devnet • Anchor Framework
           </p>
         </footer>
       </main>

@@ -24,39 +24,57 @@ export function PreviousWinners({ gameState, hasLastWinner, showWinnerDetails, s
 
     const latestWinner = validWinners[0];
 
+    const medals = ["🥇", "🥈", "🥉"];
+
     return (
-        <div className="rounded-2xl border border-border-low bg-card overflow-hidden">
+        <div className="glass-card rounded-2xl overflow-hidden animate-fadeInUp stagger-4">
             <button
                 onClick={() => setShowWinnerDetails(!showWinnerDetails)}
-                className="w-full px-5 py-4 flex items-center justify-between cursor-pointer transition hover:bg-cream/5"
+                className="w-full px-5 py-4 flex items-center justify-between cursor-pointer transition-colors duration-300 hover:bg-[rgba(255,255,255,0.02)]"
             >
                 <div className="flex items-center gap-3">
                     <span className="text-2xl">🏆</span>
                     <div className="text-left">
-                        <p className="text-xs uppercase tracking-[0.15em] text-muted font-semibold">
+                        <p className="section-label">
                             Previous Winners
-                            <span className="ml-2 inline-flex items-center justify-center px-1.5 py-0.5 rounded-full bg-primary/15 text-primary text-[10px] font-bold">{validWinners.length}</span>
+                            <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                style={{
+                                    background: 'var(--accent-dim)',
+                                    color: 'var(--accent)',
+                                }}
+                            >
+                                {validWinners.length}
+                            </span>
                         </p>
-                        <p className="text-sm font-bold font-mono text-gold-gradient">
+                        <p className="text-sm font-bold font-mono text-gold-gradient mt-1">
                             {formatAddress(latestWinner.address)}
                         </p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-bold text-gold-gradient">{formatSol(latestWinner.prize)} SOL</span>
-                    <span className={`text-muted transition-transform duration-200 ${showWinnerDetails ? "rotate-180" : ""}`}>
-                        ▼
+                    <span className={`text-muted text-xs transition-transform duration-300 ${showWinnerDetails ? "rotate-180" : ""}`}>
+                        ▾
                     </span>
                 </div>
             </button>
 
             {showWinnerDetails && (
-                <div className="border-t border-border-low divide-y divide-border-low animate-[fadeIn_0.2s_ease-out]">
+                <div className="border-t border-border-low animate-slideDown">
                     {validWinners.map((winner, idx) => (
-                        <div key={idx} className="px-5 py-3 flex items-center justify-between hover:bg-cream/5">
+                        <div key={idx} className="px-5 py-3.5 flex items-center justify-between transition-colors duration-300 hover:bg-[rgba(255,255,255,0.02)]"
+                            style={{ borderBottom: idx < validWinners.length - 1 ? '1px solid var(--border-low)' : 'none' }}
+                        >
                             <div className="flex items-center gap-3">
-                                <span className="text-muted text-xs">Round {winner.roundNumber}</span>
-                                <span className="text-xs font-mono font-bold text-foreground break-all">{formatAddress(winner.address)}</span>
+                                <span className="text-lg">{medals[idx] || "🏅"}</span>
+                                <div>
+                                    <span className="text-xs font-mono font-bold text-foreground">
+                                        {formatAddress(winner.address)}
+                                    </span>
+                                    <span className="text-muted text-[10px] ml-2 font-medium">
+                                        Round {winner.roundNumber}
+                                    </span>
+                                </div>
                             </div>
                             <div className="text-right">
                                 <p className="text-sm font-bold text-gold-gradient">{formatSol(winner.prize)} SOL</p>

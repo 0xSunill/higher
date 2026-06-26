@@ -251,10 +251,13 @@ export function GameCard() {
 
     if (loading) {
         return (
-            <section className="w-full max-w-2xl mx-auto space-y-6 rounded-2xl border border-border-low bg-card p-8 shadow-[0_20px_80px_-40px_rgba(255,215,0,0.1)]">
-                <div className="flex items-center justify-center gap-3 py-12">
-                    <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-                    <span className="text-muted">Loading game state...</span>
+            <section className="w-full max-w-2xl mx-auto glass-card rounded-2xl p-8 animate-fadeIn">
+                <div className="flex flex-col items-center justify-center gap-4 py-16">
+                    <div className="relative">
+                        <div className="h-10 w-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+                        <div className="absolute inset-0 h-10 w-10 rounded-full border-2 border-transparent border-b-primary/10 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+                    </div>
+                    <span className="text-muted text-sm font-medium">Loading game state...</span>
                 </div>
             </section>
         );
@@ -262,22 +265,24 @@ export function GameCard() {
 
     if (!gameExists || !gameState) {
         return (
-            <section className="w-full max-w-2xl mx-auto space-y-6 rounded-2xl border border-border-low bg-card p-8 shadow-[0_20px_80px_-40px_rgba(255,215,0,0.1)]">
-                <div className="text-center space-y-4 py-8">
-                    <div className="text-6xl animate-crown-pulse">👑</div>
-                    <h2 className="text-2xl font-bold text-gold-gradient">No Game Active</h2>
-                    <p className="text-muted max-w-md mx-auto">
-                        Be the first to initialize a new round of Higher! Set up the game and become the founding King.
-                    </p>
+            <section className="w-full max-w-2xl mx-auto glass-card-glow rounded-2xl p-8 animate-fadeInUp">
+                <div className="text-center space-y-5 py-6">
+                    <div className="text-7xl animate-crown-float drop-shadow-[0_0_30px_rgba(245,197,24,0.15)]">👑</div>
+                    <div className="space-y-2">
+                        <h2 className="text-2xl font-bold text-gold-shimmer">No Game Active</h2>
+                        <p className="text-sm text-muted max-w-sm mx-auto leading-relaxed">
+                            Be the first to initialize a new round of Higher! Set up the game and become the founding King.
+                        </p>
+                    </div>
                     {status === "connected" ? (
-                        <button onClick={handleInitialize} disabled={isSending} className="btn-gold rounded-xl px-8 py-3 text-lg">
+                        <button onClick={handleInitialize} disabled={isSending} className="btn-gold rounded-xl px-8 py-3.5 text-lg">
                             {isSending ? "Initializing..." : "🏰 Initialize Game"}
                         </button>
                     ) : (
                         <p className="text-sm text-muted">Connect your wallet to initialize the game</p>
                     )}
                     {txStatus && (
-                        <div className="rounded-lg border border-border-low bg-cream/50 px-4 py-3 text-sm mx-auto max-w-md">{txStatus}</div>
+                        <div className="tx-status mx-auto max-w-md">{txStatus}</div>
                     )}
                 </div>
             </section>
