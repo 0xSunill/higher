@@ -32,14 +32,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Providers>
-        <body
-          suppressHydrationWarning
-          className={`${inter.variable} ${geistMono.variable} antialiased`}
-        >
+      <body
+        suppressHydrationWarning
+        className={`${inter.variable} ${geistMono.variable} antialiased`}
+      >
+        <Providers>
           {children}
-        </body>
-      </Providers>
+        </Providers>
+      </body>
     </html>
   );
 }

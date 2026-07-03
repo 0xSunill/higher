@@ -26,6 +26,8 @@ export const HIGHER_ERROR__GAME_NOT_ACTIVE = 0x1773; // 6003
 export const HIGHER_ERROR__OVERFLOW = 0x1774; // 6004
 /** InvalidMultiplier: Multiplier must be between 1.25x and 3x */
 export const HIGHER_ERROR__INVALID_MULTIPLIER = 0x1775; // 6005
+/** PriceTooHigh: Price exceeds maximum acceptable price (slippage protection) */
+export const HIGHER_ERROR__PRICE_TOO_HIGH = 0x1776; // 6006
 
 export type HigherError =
   | typeof HIGHER_ERROR__GAME_NOT_ACTIVE
@@ -33,7 +35,8 @@ export type HigherError =
   | typeof HIGHER_ERROR__GAME_OVER
   | typeof HIGHER_ERROR__INVALID_MULTIPLIER
   | typeof HIGHER_ERROR__NOT_KING
-  | typeof HIGHER_ERROR__OVERFLOW;
+  | typeof HIGHER_ERROR__OVERFLOW
+  | typeof HIGHER_ERROR__PRICE_TOO_HIGH;
 
 let higherErrorMessages: Record<HigherError, string> | undefined;
 if (process.env.NODE_ENV !== "production") {
@@ -44,6 +47,7 @@ if (process.env.NODE_ENV !== "production") {
     [HIGHER_ERROR__INVALID_MULTIPLIER]: `Multiplier must be between 1.25x and 3x`,
     [HIGHER_ERROR__NOT_KING]: `Only the current king can claim the prize`,
     [HIGHER_ERROR__OVERFLOW]: `Arithmetic overflow`,
+    [HIGHER_ERROR__PRICE_TOO_HIGH]: `Price exceeds maximum acceptable price (slippage protection)`,
   };
 }
 

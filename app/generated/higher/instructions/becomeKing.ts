@@ -76,15 +76,17 @@ export type BecomeKingInstruction<
 export type BecomeKingInstructionData = {
   discriminator: ReadonlyUint8Array;
   multiplierBps: bigint;
+  maxPrice: bigint;
 };
 
-export type BecomeKingInstructionDataArgs = { multiplierBps: number | bigint };
+export type BecomeKingInstructionDataArgs = { multiplierBps: number | bigint; maxPrice: number | bigint };
 
 export function getBecomeKingInstructionDataEncoder(): FixedSizeEncoder<BecomeKingInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
       ["multiplierBps", getU64Encoder()],
+      ["maxPrice", getU64Encoder()],
     ]),
     (value) => ({ ...value, discriminator: BECOME_KING_DISCRIMINATOR }),
   );
@@ -94,6 +96,7 @@ export function getBecomeKingInstructionDataDecoder(): FixedSizeDecoder<BecomeKi
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["multiplierBps", getU64Decoder()],
+    ["maxPrice", getU64Decoder()],
   ]);
 }
 
@@ -119,6 +122,7 @@ export type BecomeKingAsyncInput<
   vault?: Address<TAccountVault>;
   systemProgram?: Address<TAccountSystemProgram>;
   multiplierBps: BecomeKingInstructionDataArgs["multiplierBps"];
+  maxPrice: BecomeKingInstructionDataArgs["maxPrice"];
 };
 
 export async function getBecomeKingInstructionAsync<
@@ -223,6 +227,7 @@ export type BecomeKingInput<
   vault: Address<TAccountVault>;
   systemProgram?: Address<TAccountSystemProgram>;
   multiplierBps: BecomeKingInstructionDataArgs["multiplierBps"];
+  maxPrice: BecomeKingInstructionDataArgs["maxPrice"];
 };
 
 export function getBecomeKingInstruction<

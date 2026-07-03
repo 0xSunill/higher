@@ -162,7 +162,10 @@ export function GameCard() {
                     { address: vaultPda, role: 1 as const },
                     { address: SYSTEM_PROGRAM_ADDRESS, role: 0 as const },
                 ],
-                data: getBecomeKingInstructionDataEncoder().encode({ multiplierBps: selectedMultiplierRef.current.bps }),
+                data: getBecomeKingInstructionDataEncoder().encode({
+                    multiplierBps: selectedMultiplierRef.current.bps,
+                    maxPrice: yourPrice,
+                }),
             };
             setTxStatus("Awaiting signature...");
             const signature = await send({ instructions: [instruction] });
@@ -223,7 +226,10 @@ export function GameCard() {
                     { address: vaultPda, role: 1 as const },
                     { address: SYSTEM_PROGRAM_ADDRESS, role: 0 as const },
                 ],
-                data: getBecomeKingInstructionDataEncoder().encode({ multiplierBps: selectedMultiplierRef.current.bps }),
+                data: getBecomeKingInstructionDataEncoder().encode({
+                    multiplierBps: selectedMultiplierRef.current.bps,
+                    maxPrice: yourPrice,
+                }),
             };
 
             setTxStatus("Awaiting signature...");

@@ -43,12 +43,13 @@ mod tests {
         }
     }
 
-    fn create_become_king_ix(player: &Pubkey, multiplier_bps: u64) -> Instruction {
+    fn create_become_king_ix(player: &Pubkey, multiplier_bps: u64, max_price: u64) -> Instruction {
         let (game_state_pda, _) = get_game_state_pda();
         let (vault_pda, _) = get_vault_pda();
 
         let mut data = DISC_BECOME_KING.to_vec();
         data.extend_from_slice(&multiplier_bps.to_le_bytes());
+        data.extend_from_slice(&max_price.to_le_bytes());
 
         Instruction {
             program_id: PROGRAM_ID,
@@ -175,7 +176,7 @@ mod tests {
         svm.airdrop(&player.pubkey(), 10 * LAMPORTS_PER_SOL)
             .unwrap();
 
-        let ix = create_become_king_ix(&player.pubkey(), 12500); // 1.25x multiplier
+        let ix = create_become_king_ix(&player.pubkey(), 12500, STARTING_PRICE); // 1.25x multiplier, max_price = starting price
         let blockhash = svm.latest_blockhash();
         let tx = Transaction::new_signed_with_payer(
             &[ix],
@@ -202,8 +203,8 @@ mod tests {
 
         assert_eq!(current_king, player.pubkey());
         assert_eq!(pot_amount, STARTING_PRICE);
-        // Price should increase 1.25x: 10_000_000 * 1.25 = 12_500_000
-        assert_eq!(current_price, 12_500_000);
+        // First king pays base price; current_price is set to what they paid
+        assert_eq!(current_price, STARTING_PRICE);
 
         // Verify vault has funds
         let (vault_pda, _) = get_vault_pda();
@@ -238,7 +239,7 @@ mod tests {
         svm.airdrop(&player1.pubkey(), 10 * LAMPORTS_PER_SOL)
             .unwrap();
 
-        let ix = create_become_king_ix(&player1.pubkey(), 12500); // 1.25x multiplier
+        let ix = create_become_king_ix(&player1.pubkey(), 12500, STARTING_PRICE); // 1.25x multiplier
         let blockhash = svm.latest_blockhash();
         let tx = Transaction::new_signed_with_payer(
             &[ix],
@@ -253,7 +254,7 @@ mod tests {
         svm.airdrop(&player2.pubkey(), 10 * LAMPORTS_PER_SOL)
             .unwrap();
 
-        let ix = create_become_king_ix(&player2.pubkey(), 12500); // 1.25x multiplier
+        let ix = create_become_king_ix(&player2.pubkey(), 12500, 12_500_000); // 1.25x multiplier, max_price = expected price
         let blockhash = svm.latest_blockhash();
         let tx = Transaction::new_signed_with_payer(
             &[ix],
@@ -275,8 +276,8 @@ mod tests {
         assert_eq!(current_king, player2.pubkey());
         // Total pot: 10_000_000 + 12_500_000 = 22_500_000
         assert_eq!(pot_amount, 22_500_000);
-        // Price after second king: 12_500_000 * 1.25 = 15_625_000
-        assert_eq!(current_price, 15_625_000);
+        // Price after second king: 10_000_000 * 1.25 = 12_500_000 (what player2 paid)
+        assert_eq!(current_price, 12_500_000);
     }
 
     #[test]
@@ -306,7 +307,7 @@ mod tests {
         svm.airdrop(&player.pubkey(), 10 * LAMPORTS_PER_SOL)
             .unwrap();
 
-        let ix = create_become_king_ix(&player.pubkey(), 12500); // 1.25x multiplier
+        let ix = create_become_king_ix(&player.pubkey(), 12500, STARTING_PRICE); // 1.25x multiplier
         let blockhash = svm.latest_blockhash();
         let tx = Transaction::new_signed_with_payer(
             &[ix],
@@ -357,7 +358,7 @@ mod tests {
         svm.airdrop(&player1.pubkey(), 10 * LAMPORTS_PER_SOL)
             .unwrap();
 
-        let ix = create_become_king_ix(&player1.pubkey(), 12500);
+        let ix = create_become_king_ix(&player1.pubkey(), 12500, STARTING_PRICE);
         let blockhash = svm.latest_blockhash();
         let tx = Transaction::new_signed_with_payer(
             &[ix],
@@ -394,5 +395,82 @@ mod tests {
 
         let final_p1_balance = svm.get_account(&player1.pubkey()).unwrap().lamports;
         assert!(final_p1_balance > initial_p1_balance, "Player 1 should have received the prize");
+    }
+
+    #[test]
+    fn test_slippage_protection_rejects_price_too_high() {
+        let mut svm = LiteSVM::new();
+
+        let program_bytes = include_bytes!("../../../target/deploy/higher.so");
+        svm.add_program(PROGRAM_ID, program_bytes);
+
+        let authority = Keypair::new();
+        svm.airdrop(&authority.pubkey(), 10 * LAMPORTS_PER_SOL)
+            .unwrap();
+
+        // Initialize
+        let ix = create_initialize_ix(&authority.pubkey());
+        let blockhash = svm.latest_blockhash();
+        let tx = Transaction::new_signed_with_payer(
+            &[ix],
+            Some(&authority.pubkey()),
+            &[&authority],
+            blockhash,
+        );
+        svm.send_transaction(tx).unwrap();
+
+        // Player 1 becomes king at 0.01 SOL
+        let player1 = Keypair::new();
+        svm.airdrop(&player1.pubkey(), 10 * LAMPORTS_PER_SOL)
+            .unwrap();
+
+        let ix = create_become_king_ix(&player1.pubkey(), 12500, STARTING_PRICE);
+        let blockhash = svm.latest_blockhash();
+        let tx = Transaction::new_signed_with_payer(
+            &[ix],
+            Some(&player1.pubkey()),
+            &[&player1],
+            blockhash,
+        );
+        svm.send_transaction(tx).unwrap();
+
+        // Player 2 tries to become king but sets max_price too low
+        // Actual price would be 10_000_000 * 1.25 = 12_500_000
+        // But player signed with max_price = 10_000_000 (the old price they saw)
+        let player2 = Keypair::new();
+        svm.airdrop(&player2.pubkey(), 10 * LAMPORTS_PER_SOL)
+            .unwrap();
+
+        let ix = create_become_king_ix(&player2.pubkey(), 12500, STARTING_PRICE); // max_price too low!
+        let blockhash = svm.latest_blockhash();
+        let tx = Transaction::new_signed_with_payer(
+            &[ix],
+            Some(&player2.pubkey()),
+            &[&player2],
+            blockhash,
+        );
+
+        let result = svm.send_transaction(tx);
+        assert!(
+            result.is_err(),
+            "Should fail because computed price (12_500_000) exceeds max_price (10_000_000)"
+        );
+
+        // Player 2 succeeds with correct max_price
+        let ix = create_become_king_ix(&player2.pubkey(), 12500, 12_500_000); // correct max_price
+        let blockhash = svm.latest_blockhash();
+        let tx = Transaction::new_signed_with_payer(
+            &[ix],
+            Some(&player2.pubkey()),
+            &[&player2],
+            blockhash,
+        );
+
+        let result = svm.send_transaction(tx);
+        assert!(
+            result.is_ok(),
+            "Should succeed with correct max_price: {:?}",
+            result.err()
+        );
     }
 }

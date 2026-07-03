@@ -22,8 +22,8 @@ pub mod higher {
     }
 
   
-    pub fn become_king(ctx: Context<BecomeKing>, multiplier_bps: u64) -> Result<()> {
-        instructions::become_king::become_king(ctx, multiplier_bps)
+    pub fn become_king(ctx: Context<BecomeKing>, multiplier_bps: u64, max_price: u64) -> Result<()> {
+        instructions::become_king::become_king(ctx, multiplier_bps, max_price)
     }
 
     pub fn claim_prize(ctx: Context<ClaimPrize>) -> Result<()> {

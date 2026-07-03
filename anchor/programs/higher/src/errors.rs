@@ -14,4 +14,6 @@ pub enum HigherError {
     Overflow,
     #[msg("Multiplier must be between 1.25x and 3x")]
     InvalidMultiplier,
+    #[msg("Price exceeds maximum acceptable price (slippage protection)")]
+    PriceTooHigh,
 }

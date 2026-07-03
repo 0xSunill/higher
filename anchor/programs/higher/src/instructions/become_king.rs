@@ -28,7 +28,7 @@ pub struct BecomeKing<'info> {
 }
 
 
-pub fn become_king(ctx: Context<BecomeKing>, multiplier_bps: u64) -> Result<()> {
+pub fn become_king(ctx: Context<BecomeKing>, multiplier_bps: u64, max_price: u64) -> Result<()> {
     let clock = Clock::get()?;
     let game = &mut ctx.accounts.game_state;
 
@@ -61,6 +61,9 @@ pub fn become_king(ctx: Context<BecomeKing>, multiplier_bps: u64) -> Result<()> 
             .checked_div(10_000)
             .ok_or(HigherError::Overflow)?
     };
+
+    // Slippage protection: reject if computed price exceeds user's maximum
+    require!(price <= max_price, HigherError::PriceTooHigh);
 
     transfer(
         CpiContext::new(
