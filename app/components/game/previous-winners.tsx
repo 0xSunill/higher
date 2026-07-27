@@ -7,12 +7,11 @@ const MAX_WINNERS_SHOWN = 3;
 
 type PreviousWinnersProps = {
     gameState: GameState;
-    hasLastWinner: boolean;
     showWinnerDetails: boolean;
     setShowWinnerDetails: (show: boolean) => void;
 };
 
-export function PreviousWinners({ gameState, hasLastWinner, showWinnerDetails, setShowWinnerDetails }: PreviousWinnersProps) {
+export function PreviousWinners({ gameState, showWinnerDetails, setShowWinnerDetails }: PreviousWinnersProps) {
     if (!gameState) return null;
 
     // Filter out empty/default slots and take only the last 3 valid winners

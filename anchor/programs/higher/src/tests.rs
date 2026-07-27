@@ -109,7 +109,7 @@ mod tests {
         let mut svm = LiteSVM::new();
 
         let program_bytes = include_bytes!("../../../target/deploy/higher.so");
-        svm.add_program(PROGRAM_ID, program_bytes);
+        let _ = svm.add_program(PROGRAM_ID, program_bytes);
 
         let authority = Keypair::new();
         svm.airdrop(&authority.pubkey(), 10 * LAMPORTS_PER_SOL)
@@ -154,7 +154,7 @@ mod tests {
         let mut svm = LiteSVM::new();
 
         let program_bytes = include_bytes!("../../../target/deploy/higher.so");
-        svm.add_program(PROGRAM_ID, program_bytes);
+        let _ = svm.add_program(PROGRAM_ID, program_bytes);
 
         let authority = Keypair::new();
         svm.airdrop(&authority.pubkey(), 10 * LAMPORTS_PER_SOL)
@@ -217,7 +217,7 @@ mod tests {
         let mut svm = LiteSVM::new();
 
         let program_bytes = include_bytes!("../../../target/deploy/higher.so");
-        svm.add_program(PROGRAM_ID, program_bytes);
+        let _ = svm.add_program(PROGRAM_ID, program_bytes);
 
         let authority = Keypair::new();
         svm.airdrop(&authority.pubkey(), 10 * LAMPORTS_PER_SOL)
@@ -285,7 +285,7 @@ mod tests {
         let mut svm = LiteSVM::new();
 
         let program_bytes = include_bytes!("../../../target/deploy/higher.so");
-        svm.add_program(PROGRAM_ID, program_bytes);
+        let _ = svm.add_program(PROGRAM_ID, program_bytes);
 
         let authority = Keypair::new();
         svm.airdrop(&authority.pubkey(), 10 * LAMPORTS_PER_SOL)
@@ -336,7 +336,7 @@ mod tests {
         let mut svm = LiteSVM::new();
 
         let program_bytes = include_bytes!("../../../target/deploy/higher.so");
-        svm.add_program(PROGRAM_ID, program_bytes);
+        let _ = svm.add_program(PROGRAM_ID, program_bytes);
 
         let authority = Keypair::new();
         svm.airdrop(&authority.pubkey(), 10 * LAMPORTS_PER_SOL)
@@ -402,7 +402,7 @@ mod tests {
         let mut svm = LiteSVM::new();
 
         let program_bytes = include_bytes!("../../../target/deploy/higher.so");
-        svm.add_program(PROGRAM_ID, program_bytes);
+        let _ = svm.add_program(PROGRAM_ID, program_bytes);
 
         let authority = Keypair::new();
         svm.airdrop(&authority.pubkey(), 10 * LAMPORTS_PER_SOL)

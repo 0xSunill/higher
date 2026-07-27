@@ -106,7 +106,6 @@ export function GameCard() {
 
     const hasKing = gameState?.currentKing && gameState.currentKing !== DEFAULT_PUBKEY;
     const timerStarted = gameState ? Number(gameState.endTime) > 0 : false;
-    const hasLastWinner = gameState?.recentWinners?.[0]?.address && gameState.recentWinners[0].address !== DEFAULT_PUBKEY;
 
     useEffect(() => {
         if (!gameState || !timerStarted) {
@@ -126,6 +125,18 @@ export function GameCard() {
     const isKing = walletAddress && gameState ? walletAddress === gameState.currentKing : false;
     const isExpired = timerStarted && countdown === 0 && gameState !== null;
 
+    // With the new logic: the multiplier affects YOUR payment
+    // First king pays the base currentPrice (0.01 SOL)
+    // Subsequent kings pay currentPrice * multiplier
+    const basePrice = gameState
+        ? (isExpired ? 10000000n : gameState.currentPrice)
+        : 0n;
+    const yourPrice = gameState
+        ? (hasKing && !isExpired
+            ? basePrice * BigInt(selectedMultiplier.bps) / 10000n
+            : basePrice)
+        : 0n;
+
     const handleInitialize = useCallback(async () => {
         if (!walletAddress || !gameStatePda || !vaultPda) return;
         try {
@@ -142,7 +153,7 @@ export function GameCard() {
             };
             setTxStatus("Awaiting signature...");
             const signature = await send({ instructions: [instruction] });
-            setTxStatus(`Game I nitialized! Tx: ${signature?.slice(0, 20)}...`);
+            setTxStatus(`Game Initialized! Tx: ${signature?.slice(0, 20)}...`);
             setTimeout(fetchGameState, 2000);
         } catch (err) {
             console.error("Initialize failed:", err);
@@ -175,7 +186,7 @@ export function GameCard() {
             console.error("Become king failed:", err);
             setTxStatus(`Error: ${extractSolanaErrorMessage(err)}`);
         }
-    }, [walletAddress, gameStatePda, vaultPda, send, fetchGameState]);
+    }, [walletAddress, gameStatePda, vaultPda, yourPrice, send, fetchGameState]);
 
     const handleClaimPrize = useCallback(async () => {
         if (!walletAddress || !gameStatePda || !vaultPda || !gameState) return;
@@ -241,19 +252,7 @@ export function GameCard() {
             console.error("Start new round failed:", err);
             setTxStatus(`Error: ${extractSolanaErrorMessage(err)}`);
         }
-    }, [walletAddress, gameStatePda, vaultPda, gameState, send, fetchGameState]);
-
-    // With the new logic: the multiplier affects YOUR payment
-    // First king pays the base currentPrice (0.01 SOL)
-    // Subsequent kings pay currentPrice * multiplier
-    const basePrice = gameState
-        ? (isExpired ? 10000000n : gameState.currentPrice)
-        : 0n;
-    const yourPrice = gameState
-        ? (hasKing && !isExpired
-            ? basePrice * BigInt(selectedMultiplier.bps) / 10000n
-            : basePrice)
-        : 0n;
+    }, [walletAddress, gameStatePda, vaultPda, gameState, yourPrice, send, fetchGameState]);
 
     if (loading) {
         return (
@@ -325,7 +324,6 @@ export function GameCard() {
 
             <PreviousWinners
                 gameState={gameState}
-                hasLastWinner={hasLastWinner ?? false}
                 showWinnerDetails={showWinnerDetails}
                 setShowWinnerDetails={setShowWinnerDetails}
             />

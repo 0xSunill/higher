@@ -13,6 +13,7 @@ const HIGHER_PROGRAM_ERRORS: Record<number, string> = {
     6003: "GameNotActive — The game is not currently active",
     6004: "Overflow — Arithmetic overflow",
     6005: "InvalidMultiplier — Multiplier must be between 1.25x and 3x",
+    6006: "PriceTooHigh — Price exceeds maximum acceptable price (slippage protection)",
 };
 
 /**
