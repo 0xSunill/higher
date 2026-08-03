@@ -18,7 +18,7 @@ export function GameHeader({ gameState, hasKing, isKing, timerStarted, countdown
             {/* Crown / King Open Layout */}
             <div className="flex flex-col items-center gap-5">
                 <div className="relative">
-                    <div className="animate-crown-float drop-shadow-[0_0_30px_rgba(45,212,191,0.4)] text-[#2dd4bf] bg-[#2dd4bf24] p-5 rounded-full border border-[#2dd4bf40]">
+                    <div className="animate-crown-float icon-badge-neon p-5">
                         <Crown size={56} strokeWidth={1.5} />
                     </div>
                     {isKing && (

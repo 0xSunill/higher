@@ -30,7 +30,7 @@ export function PreviousWinners({ gameState, showWinnerDetails, setShowWinnerDet
                 className="w-full px-5 py-4 flex items-center justify-between cursor-pointer group"
             >
                 <div className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover:bg-primary/20 transition-colors">
+                    <div className="icon-badge-neon p-2 group-hover:scale-105 transition-transform">
                         <Trophy size={18} strokeWidth={2} />
                     </div>
                     <div className="text-left">
@@ -46,7 +46,7 @@ export function PreviousWinners({ gameState, showWinnerDetails, setShowWinnerDet
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-success">{formatSol(latestWinner.prize)} SOL</span>
+                    <span className="text-sm font-bold text-aurora-gradient">{formatSol(latestWinner.prize)} SOL</span>
                     <ChevronDown 
                         size={16} 
                         className={`text-muted transition-transform duration-300 ${showWinnerDetails ? "rotate-180" : ""}`} 
@@ -72,7 +72,7 @@ export function PreviousWinners({ gameState, showWinnerDetails, setShowWinnerDet
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="text-sm font-bold text-success">{formatSol(winner.prize)} SOL</p>
+                                <p className="text-sm font-bold text-aurora-gradient">{formatSol(winner.prize)} SOL</p>
                             </div>
                         </div>
                     ))}

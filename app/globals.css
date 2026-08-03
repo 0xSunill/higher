@@ -6,25 +6,13 @@
 @tailwind utilities;
 
 :root {
-  /* Aurora dark palette */
-  --bg: #0a0d16;
-  --foreground: #ffffff;
-  --card: rgba(20, 26, 41, 0.85);
-  --card-solid: #141a29;
-  --card-foreground: #ffffff;
+  /* Neon glow dark theme */
+  --bg: #0c0817;
+  --foreground: #f1f5f9;
+  --card: rgba(23, 18, 37, 0.85); /* #171225 with opacity for blur */
+  --card-solid: #171225;
+  --card-foreground: #f1f5f9;
   --glass: rgba(255, 255, 255, 0.06);
-  --muted: #94a3b8;
-  --border-strong: rgba(124, 219, 255, 0.2);
-  --border-low: rgba(255, 255, 255, 0.08);
-  --border: #20263b;
-
-  --accent: #7cdbff;
-  --accent-hover: #a5e8ff;
-  --accent-dim: rgba(124, 219, 255, 0.1);
-
-  --radius: 1rem;
-  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   /* Aurora glows & gradients */
   --glow-aurora: 0 0 40px rgba(124, 219, 255, 0.08), 0 0 80px rgba(167, 139, 250, 0.04);
