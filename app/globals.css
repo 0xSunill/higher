@@ -95,19 +95,115 @@
   }
 
   body {
-    @apply bg-bg1 text-foreground antialiased;
-    font-family: var(--font-sans);
-    color-scheme: dark light;
-    background: var(--gradient-bg);
-    background-attachment: fixed;
-    min-height: 100vh;
+    background-color: var(--bg);
+    color: var(--foreground);
+    font-family: var(--font-inter), sans-serif;
+    -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
+}
 
-  ::selection {
-    background: rgba(167, 139, 250, 0.3);
-    color: #fff;
-  }
+/* ─── CUSTOM UTILITIES ─── */
+.text-aurora-gradient {
+  background: var(--gradient-aurora);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+.bg-aurora-gradient {
+  background: var(--gradient-aurora);
+}
+
+.divider-aurora {
+  height: 1px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ─── BUTTONS ─── */
+.btn-aurora {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-low);
+  color: var(--foreground);
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  box-shadow: 0 0 24px rgba(45, 212, 191, 0.25);
+}
+
+.btn-aurora::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-aurora);
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+.btn-aurora:hover::before {
+  opacity: 1;
+}
+
+.btn-aurora:hover {
+  transform: translateY(-1px);
+}
+
+.btn-aurora > * {
+  position: relative;
+  z-index: 1;
+  color: #0c0817;
+  font-weight: 700;
+}
+
+/* ─── ICON BADGE (NEON) ─── */
+.icon-badge-neon {
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.3), rgba(236, 72, 153, 0.18));
+  border: 1px solid rgba(45, 212, 191, 0.55);
+  box-shadow: 0 0 22px rgba(45, 212, 191, 0.4);
+  color: #7dffea;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── MULTIPLIER CHIPS ─── */
+.multiplier-chip {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #a1a1aa;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s;
+  position: relative;
+}
+
+.multiplier-chip:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--foreground);
+}
+
+.multiplier-chip.active {
+  background: rgba(45, 212, 191, 0.12);
+  border: 1.5px solid #22d3ee;
+  color: #67e8f9;
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15), 0 0 18px rgba(34, 211, 238, 0.35);
+}
+
+/* ─── TYPOGRAPHY ─── */
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #71717a;
 }
 
 /* ─── ANIMATED SVG BACKGROUND ─── */

@@ -52,7 +52,7 @@ export function GameControls({
                 /* Winner can claim */
                 <div className="space-y-4">
                     <div className="text-center space-y-3 py-2 flex flex-col items-center">
-                        <div className="icon-badge-neon p-4 animate-crown-float">
+                        <div className="icon-badge-neon w-16 h-16 animate-crown-float">
                             <Trophy size={40} strokeWidth={1.5} />
                         </div>
                         <p className="text-2xl font-bold text-foreground drop-shadow-sm">You Won!</p>
@@ -77,7 +77,7 @@ export function GameControls({
                 /* Game over — start new round */
                 <div className="space-y-5">
                     <div className="text-center space-y-3 py-1 flex flex-col items-center">
-                        <div className="icon-badge-neon p-3">
+                        <div className="icon-badge-neon w-14 h-14">
                             <Timer size={32} strokeWidth={1.5} />
                         </div>
                         <p className="text-xl font-bold text-red-400 drop-shadow-sm">Game Over!</p>
@@ -170,8 +170,8 @@ export function GameControls({
                         </div>
                         <div className="text-right">
                             <p className="section-label">You pay</p>
-                            <p className="text-lg font-bold text-aurora-gradient mt-1 drop-shadow-sm">
-                                {formatSol(yourPrice)} <span className="text-xs font-medium" style={{ WebkitTextFillColor: 'var(--muted)' }}>SOL</span>
+                            <p className="text-lg font-bold text-foreground mt-1 drop-shadow-sm">
+                                {formatSol(yourPrice)} <span className="text-xs font-medium text-muted">SOL</span>
                             </p>
                         </div>
                     </div>
