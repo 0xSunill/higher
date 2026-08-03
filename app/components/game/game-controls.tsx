@@ -52,7 +52,7 @@ export function GameControls({
                 /* Winner can claim */
                 <div className="space-y-4">
                     <div className="text-center space-y-3 py-2 flex flex-col items-center">
-                        <div className="text-primary bg-primary/10 p-4 rounded-full border border-primary/20 animate-crown-float drop-shadow-[0_0_20px_rgba(167,139,250,0.3)]">
+                        <div className="text-[#2dd4bf] bg-[#2dd4bf24] p-4 rounded-full border border-[#2dd4bf40] animate-crown-float drop-shadow-[0_0_20px_rgba(45,212,191,0.3)]">
                             <Trophy size={40} strokeWidth={1.5} />
                         </div>
                         <p className="text-2xl font-bold text-foreground drop-shadow-sm">You Won!</p>
@@ -77,7 +77,7 @@ export function GameControls({
                 /* Game over — start new round */
                 <div className="space-y-5">
                     <div className="text-center space-y-3 py-1 flex flex-col items-center">
-                        <div className="text-red-400 bg-red-400/10 p-3 rounded-full border border-red-400/20">
+                        <div className="text-[#f87171] bg-[#f8717124] p-3 rounded-full border border-[#f8717140]">
                             <Timer size={32} strokeWidth={1.5} />
                         </div>
                         <p className="text-xl font-bold text-red-400 drop-shadow-sm">Game Over!</p>
