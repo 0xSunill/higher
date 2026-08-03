@@ -4,12 +4,12 @@
 :root {
   /* Aurora dark palette */
   --bg: #0b1020;
-  --foreground: #e9ecf8;
-  --card: rgba(17, 22, 42, 0.7);
+  --foreground: #ffffff;
+  --card: rgba(17, 22, 42, 0.25);
   --card-solid: #11162a;
-  --card-foreground: #e9ecf8;
+  --card-foreground: #ffffff;
   --glass: rgba(255, 255, 255, 0.06);
-  --muted: #a3accb;
+  --muted: #cbd5e1;
   --border-strong: rgba(124, 219, 255, 0.2);
   --border-low: rgba(255, 255, 255, 0.06);
   --border: #20263b;
@@ -130,7 +130,7 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.65;
+  opacity: 1;
 }
 
 .bg-aurora-lines img,
@@ -201,12 +201,17 @@
 
 /* ─── GLASSMORPHISM CARD ─── */
 .glass-card {
-  background: var(--card);
-  backdrop-filter: blur(24px) saturate(1.2);
-  -webkit-backdrop-filter: blur(24px) saturate(1.2);
-  border: 1px solid var(--border-low);
+  background: rgba(11, 16, 32, 0.75);
+  backdrop-filter: blur(48px) saturate(1.8);
+  -webkit-backdrop-filter: blur(48px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   background-image: var(--gradient-card);
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.open-panel {
+  position: relative;
+  z-index: 1;
 }
 
 .glass-card:hover {

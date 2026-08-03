@@ -5,6 +5,7 @@ import {
     useWalletConnection,
     useSendTransaction,
 } from "@solana/react-hooks";
+import { Crown } from "lucide-react";
 import {
     getProgramDerivedAddress,
     getBytesEncoder,
@@ -44,7 +45,7 @@ const MULTIPLIER_OPTIONS = [
 ];
 
 export function GameCard() {
-    const { wallet, status } = useWalletConnection();
+    const { connectors, connect, disconnect, wallet, status } = useWalletConnection();
     const { send, isSending } = useSendTransaction();
 
     const [gameState, setGameState] = useState<GameState | null>(null);
@@ -256,7 +257,7 @@ export function GameCard() {
 
     if (loading) {
         return (
-            <section className="w-full max-w-2xl mx-auto glass-card rounded-2xl p-8 animate-fadeIn">
+            <section className="w-full max-w-4xl mx-auto glass-card rounded-2xl p-8 animate-fadeIn">
                 <div className="flex flex-col items-center justify-center gap-4 py-16">
                     <div className="relative">
                         <div className="h-10 w-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
@@ -270,11 +271,15 @@ export function GameCard() {
 
     if (!gameExists || !gameState) {
         return (
-            <section className="w-full max-w-2xl mx-auto glass-card-glow rounded-2xl p-8 animate-fadeInUp">
+            <section className="w-full max-w-4xl mx-auto glass-card rounded-2xl p-8 animate-fadeInUp border-dashed border-primary/30">
                 <div className="text-center space-y-5 py-6">
-                    <div className="text-7xl animate-crown-float drop-shadow-[0_0_30px_rgba(167,139,250,0.2)]">👑</div>
+                    <div className="inline-flex items-center justify-center">
+                        <div className="animate-crown-float drop-shadow-[0_0_30px_rgba(167,139,250,0.4)] text-primary bg-primary/10 p-5 rounded-full border border-primary/20">
+                            <Crown size={56} strokeWidth={1.5} />
+                        </div>
+                    </div>
                     <div className="space-y-2">
-                        <h2 className="text-2xl font-bold text-aurora-shimmer">No Game Active</h2>
+                        <h2 className="text-2xl font-bold text-foreground">No Game Active</h2>
                         <p className="text-sm text-muted max-w-sm mx-auto leading-relaxed">
                             Be the first to initialize a new round of Higher! Set up the game and become the founding King.
                         </p>
@@ -295,32 +300,42 @@ export function GameCard() {
     }
 
     return (
-        <section className="w-full max-w-2xl mx-auto space-y-5">
-            <GameHeader 
-                gameState={gameState} 
-                hasKing={hasKing ?? false} 
-                isKing={isKing ?? false} 
-                timerStarted={timerStarted} 
-                countdown={countdown} 
-                isExpired={isExpired} 
-            />
+        <div className="flex flex-col gap-6 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                {/* Left Column: Game State & Info */}
+                <div className="lg:col-span-7">
+                    <GameHeader 
+                        gameState={gameState} 
+                        hasKing={hasKing ?? false} 
+                        isKing={isKing ?? false} 
+                        timerStarted={timerStarted} 
+                        countdown={countdown} 
+                        isExpired={isExpired} 
+                    />
+                </div>
 
-            <GameControls
-                status={status}
-                isExpired={isExpired}
-                isKing={isKing ?? false}
-                hasKing={hasKing ?? false}
-                isSending={isSending}
-                txStatus={txStatus}
-                gameState={gameState}
-                yourPrice={yourPrice}
-                selectedMultiplier={selectedMultiplier}
-                MULTIPLIER_OPTIONS={MULTIPLIER_OPTIONS}
-                setSelectedMultiplier={setSelectedMultiplier}
-                handleClaimPrize={handleClaimPrize}
-                handleStartNewRound={handleStartNewRound}
-                handleBecomeKing={handleBecomeKing}
-            />
+                {/* Right Column: Actions & Controls */}
+                <div className="lg:col-span-5">
+                    <GameControls
+                        status={status}
+                        connectors={connectors}
+                        connect={connect}
+                        isExpired={isExpired}
+                        isKing={isKing ?? false}
+                        hasKing={hasKing ?? false}
+                        isSending={isSending}
+                        txStatus={txStatus}
+                        gameState={gameState}
+                        yourPrice={yourPrice}
+                        selectedMultiplier={selectedMultiplier}
+                        MULTIPLIER_OPTIONS={MULTIPLIER_OPTIONS}
+                        setSelectedMultiplier={setSelectedMultiplier}
+                        handleClaimPrize={handleClaimPrize}
+                        handleStartNewRound={handleStartNewRound}
+                        handleBecomeKing={handleBecomeKing}
+                    />
+                </div>
+            </div>
 
             <PreviousWinners
                 gameState={gameState}
@@ -332,6 +347,6 @@ export function GameCard() {
                 gameState={gameState} 
                 gameStatePda={gameStatePda} 
             />
-        </section>
+        </div>
     );
 }

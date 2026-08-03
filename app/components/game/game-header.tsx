@@ -1,5 +1,6 @@
 import { GameState } from "../../generated/higher/accounts";
 import { formatAddress, formatSol, formatCountdown } from "./utils";
+import { Crown, Sparkles } from "lucide-react";
 
 type GameHeaderProps = {
     gameState: GameState;
@@ -12,71 +13,74 @@ type GameHeaderProps = {
 
 export function GameHeader({ gameState, hasKing, isKing, timerStarted, countdown, isExpired }: GameHeaderProps) {
     return (
-        <div className="space-y-4 animate-fadeInUp stagger-2">
-            {/* Crown / King Card */}
-            <div className="glass-card-glow rounded-2xl p-7 animate-border-shimmer">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="relative">
-                        <span className="text-7xl animate-crown-float inline-block drop-shadow-[0_0_40px_rgba(167,139,250,0.25)]">
-                            👑
+        <div className="glass-card rounded-2xl p-6 flex flex-col items-center justify-center text-center space-y-4 animate-fadeInUp stagger-1 relative overflow-hidden h-full">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(124,219,255,0.08),transparent_50%)]" />
+            {/* Crown / King Open Layout */}
+            <div className="flex flex-col items-center gap-5">
+                <div className="relative">
+                    <div className="animate-crown-float drop-shadow-[0_0_30px_rgba(167,139,250,0.4)] text-primary bg-primary/10 p-5 rounded-full border border-primary/20">
+                        <Crown size={56} strokeWidth={1.5} />
+                    </div>
+                    {isKing && (
+                        <div className="absolute -bottom-2 -right-2 text-primary animate-fadeIn bg-card p-1.5 rounded-full border border-primary/30">
+                            <Sparkles size={16} />
+                        </div>
+                    )}
+                </div>
+                <div className="text-center space-y-2">
+                    <p className="section-label">Current King</p>
+                    {hasKing ? (
+                        <p className="text-2xl font-bold font-mono text-foreground tracking-wide drop-shadow-sm">
+                            {formatAddress(gameState.currentKing)}
+                        </p>
+                    ) : (
+                        <p className="text-lg font-semibold text-muted italic">
+                            Throne is empty — Be the first!
+                        </p>
+                    )}
+                    {isKing && (
+                        <span className="inline-flex items-center gap-1.5 mt-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider"
+                            style={{
+                                background: 'var(--accent-dim)',
+                                color: 'var(--primary)',
+                                border: '1px solid rgba(124, 219, 255, 0.15)'
+                            }}
+                        >
+                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-current" />
+                            That&apos;s you!
                         </span>
-                        {isKing && (
-                            <span className="absolute -bottom-1 -right-2 text-xl animate-fadeIn">✨</span>
-                        )}
-                    </div>
-                    <div className="text-center space-y-2">
-                        <p className="section-label">Current King</p>
-                        {hasKing ? (
-                            <p className="text-xl font-bold font-mono text-aurora-gradient tracking-wide">
-                                {formatAddress(gameState.currentKing)}
-                            </p>
-                        ) : (
-                            <p className="text-lg font-semibold text-muted italic">
-                                Throne is empty — Be the first!
-                            </p>
-                        )}
-                        {isKing && (
-                            <span className="inline-flex items-center gap-1.5 mt-1 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider"
-                                style={{
-                                    background: 'var(--accent-dim)',
-                                    color: 'var(--primary)',
-                                    border: '1px solid rgba(124, 219, 255, 0.15)'
-                                }}
-                            >
-                                <span className="inline-block w-1.5 h-1.5 rounded-full bg-current" />
-                                That&apos;s you!
-                            </span>
-                        )}
-                    </div>
+                    )}
                 </div>
             </div>
 
-            {/* Stats Row */}
-            <div className="grid grid-cols-3 gap-3">
+            {/* Stats Open Row */}
+            <div className="grid grid-cols-3 gap-2">
                 {/* Prize Pot */}
-                <div className="glass-card stat-card rounded-xl p-4 text-center">
+                <div className="text-center p-3">
                     <p className="section-label mb-2">Prize Pot</p>
-                    <p className="text-2xl sm:text-3xl font-extrabold tabular-nums text-aurora-gradient">
+                    <p className="text-3xl font-extrabold tabular-nums text-aurora-gradient drop-shadow-sm">
                         {formatSol(gameState.potAmount)}
                     </p>
                     <p className="text-[10px] text-muted mt-1 font-medium uppercase tracking-wider">SOL</p>
                 </div>
 
                 {/* Timer */}
-                <div className={`glass-card stat-card rounded-xl p-4 text-center ${isExpired ? 'animate-border-shimmer' : ''}`}
-                    style={isExpired ? { borderColor: 'rgba(248, 113, 113, 0.2)' } : {}}
-                >
+                <div className="text-center p-3 relative">
+                    {/* Subtle divider lines */}
+                    <div className="absolute left-0 top-1/4 bottom-1/4 w-px bg-border-low" />
+                    <div className="absolute right-0 top-1/4 bottom-1/4 w-px bg-border-low" />
+                    
                     <p className="section-label mb-2">Time Left</p>
                     {!timerStarted ? (
                         <>
-                            <p className="text-2xl sm:text-3xl font-extrabold tabular-nums font-mono text-muted/40">
+                            <p className="text-3xl font-extrabold tabular-nums font-mono text-muted/40">
                                 --:--
                             </p>
                             <p className="text-[10px] text-muted mt-1">Waiting for King</p>
                         </>
                     ) : (
                         <>
-                            <p className={`text-2xl sm:text-3xl font-extrabold tabular-nums font-mono ${
+                            <p className={`text-3xl font-extrabold tabular-nums font-mono drop-shadow-sm ${
                                 isExpired
                                     ? "text-red-400"
                                     : countdown < 60
@@ -99,9 +103,9 @@ export function GameHeader({ gameState, hasKing, isKing, timerStarted, countdown
                 </div>
 
                 {/* Current Price */}
-                <div className="glass-card stat-card rounded-xl p-4 text-center">
+                <div className="text-center p-3">
                     <p className="section-label mb-2">Base Price</p>
-                    <p className="text-2xl sm:text-3xl font-extrabold tabular-nums text-aurora-gradient">
+                    <p className="text-3xl font-extrabold tabular-nums text-foreground drop-shadow-sm">
                         {formatSol(isExpired ? 10000000n : gameState.currentPrice)}
                     </p>
                     <p className="text-[10px] text-muted mt-1 font-medium uppercase tracking-wider">SOL</p>

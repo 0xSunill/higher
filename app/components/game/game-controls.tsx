@@ -1,10 +1,13 @@
 import { GameState } from "../../generated/higher/accounts";
 import { formatSol } from "./utils";
+import { Trophy, Timer, RotateCcw, Rocket, Crown, Wallet } from "lucide-react";
 
 type MultiplierOption = { label: string; bps: number; multiplier: number };
 
 type GameControlsProps = {
     status: string;
+    connectors: readonly any[];
+    connect: (id: string) => void;
     isExpired: boolean;
     isKing: boolean;
     hasKing: boolean;
@@ -22,6 +25,8 @@ type GameControlsProps = {
 
 export function GameControls({
     status,
+    connectors,
+    connect,
     isExpired,
     isKing,
     hasKing,
@@ -36,40 +41,49 @@ export function GameControls({
     handleStartNewRound,
     handleBecomeKing,
 }: GameControlsProps) {
+    
+    const handleConnectClick = () => {
+        if (connectors.length > 0) connect(connectors[0].id);
+    };
+
     return (
-        <div className="glass-card rounded-2xl p-6 space-y-5 animate-fadeInUp stagger-3">
-            {status !== "connected" ? (
-                <div className="text-center py-8 space-y-3">
-                    <div className="text-4xl opacity-30">🔌</div>
-                    <p className="text-muted text-sm font-medium">
-                        Connect your wallet to play
-                    </p>
-                </div>
-            ) : isExpired && isKing ? (
+        <div className="glass-card rounded-2xl p-6 space-y-5 animate-fadeInUp stagger-3 h-full flex flex-col justify-center">
+            {isExpired && isKing ? (
                 /* Winner can claim */
                 <div className="space-y-4">
-                    <div className="text-center space-y-2 py-2">
-                        <div className="text-5xl animate-crown-float">🏆</div>
-                        <p className="text-xl font-bold text-aurora-gradient">You Won!</p>
+                    <div className="text-center space-y-3 py-2 flex flex-col items-center">
+                        <div className="text-primary bg-primary/10 p-4 rounded-full border border-primary/20 animate-crown-float drop-shadow-[0_0_20px_rgba(167,139,250,0.3)]">
+                            <Trophy size={40} strokeWidth={1.5} />
+                        </div>
+                        <p className="text-2xl font-bold text-foreground drop-shadow-sm">You Won!</p>
                         <p className="text-sm text-muted">Claim your prize from the pot</p>
                     </div>
-                    <button
-                        onClick={handleClaimPrize}
-                        disabled={isSending}
-                        className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide"
-                    >
-                        {isSending ? "Claiming..." : `🏆 Claim Prize — ${formatSol(gameState.potAmount)} SOL`}
-                    </button>
+                    {status !== "connected" ? (
+                        <button onClick={handleConnectClick} className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2">
+                            <Wallet size={20} /> Connect Wallet
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleClaimPrize}
+                            disabled={isSending}
+                            className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2"
+                        >
+                            <Trophy size={20} />
+                            {isSending ? "Claiming..." : `Claim Prize — ${formatSol(gameState.potAmount)} SOL`}
+                        </button>
+                    )}
                 </div>
             ) : isExpired ? (
                 /* Game over — start new round */
                 <div className="space-y-5">
-                    <div className="text-center space-y-2 py-1">
-                        <div className="text-4xl">⏰</div>
-                        <p className="text-xl font-bold text-red-400">Game Over!</p>
+                    <div className="text-center space-y-3 py-1 flex flex-col items-center">
+                        <div className="text-red-400 bg-red-400/10 p-3 rounded-full border border-red-400/20">
+                            <Timer size={32} strokeWidth={1.5} />
+                        </div>
+                        <p className="text-xl font-bold text-red-400 drop-shadow-sm">Game Over!</p>
                         <p className="text-sm text-muted max-w-sm mx-auto">
                             {hasKing
-                                ? "The King didn\u2019t claim in time. Start a new round — the pot carries over!"
+                                ? "The King didn’t claim in time. Start a new round — the pot carries over!"
                                 : "No one played this round. Start a new one!"}
                         </p>
                     </div>
@@ -94,13 +108,20 @@ export function GameControls({
                         </div>
                     </div>
 
-                    <button
-                        onClick={handleStartNewRound}
-                        disabled={isSending}
-                        className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide"
-                    >
-                        {isSending ? "Starting..." : "🔄 Start New Round — 0.0100 SOL"}
-                    </button>
+                    {status !== "connected" ? (
+                        <button onClick={handleConnectClick} className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2">
+                            <Wallet size={20} /> Connect Wallet
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleStartNewRound}
+                            disabled={isSending}
+                            className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2"
+                        >
+                            <RotateCcw size={20} />
+                            {isSending ? "Starting..." : "Start New Round — 0.0100 SOL"}
+                        </button>
+                    )}
                 </div>
             ) : (
                 /* Active game — become king */
@@ -127,7 +148,7 @@ export function GameControls({
                         </div>
                     </div>
 
-                    <div className="divider-aurora" />
+                    <div className="border-t border-dashed border-border-low" />
 
                     {/* Price Preview */}
                     <div className="rounded-xl p-4 flex items-center justify-between gap-2" style={{ background: 'var(--surface-1)' }}>
@@ -149,24 +170,36 @@ export function GameControls({
                         </div>
                         <div className="text-right">
                             <p className="section-label">You pay</p>
-                            <p className="text-lg font-bold text-aurora-gradient mt-1">
+                            <p className="text-lg font-bold text-aurora-gradient mt-1 drop-shadow-sm">
                                 {formatSol(yourPrice)} <span className="text-xs font-medium" style={{ WebkitTextFillColor: 'var(--muted)' }}>SOL</span>
                             </p>
                         </div>
                     </div>
 
                     {/* CTA Button */}
-                    <button
-                        onClick={handleBecomeKing}
-                        disabled={isSending}
-                        className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide"
-                    >
-                        {isSending
-                            ? "Confirming..."
-                            : hasKing
-                                ? `🚀 Go Higher — ${formatSol(yourPrice)} SOL`
-                                : `👑 Become First King — ${formatSol(yourPrice)} SOL`}
-                    </button>
+                    {status !== "connected" ? (
+                        <button onClick={handleConnectClick} className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2">
+                            <Wallet size={20} /> Connect Wallet
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleBecomeKing}
+                            disabled={isSending}
+                            className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2"
+                        >
+                            {isSending ? (
+                                "Confirming..."
+                            ) : hasKing ? (
+                                <>
+                                    <Rocket size={20} /> Go Higher — {formatSol(yourPrice)} SOL
+                                </>
+                            ) : (
+                                <>
+                                    <Crown size={20} /> Become First King — {formatSol(yourPrice)} SOL
+                                </>
+                            )}
+                        </button>
+                    )}
                 </div>
             )}
 

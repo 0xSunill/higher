@@ -1,102 +1,57 @@
+<!-- Aurora Waves — lines only, fully transparent background -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
   <defs>
-    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#7cdbff" stop-opacity="0.0"/>
-      <stop offset="20%" stop-color="#7cdbff" stop-opacity="0.5"/>
-      <stop offset="50%" stop-color="#a78bfa" stop-opacity="0.45"/>
-      <stop offset="80%" stop-color="#f472b6" stop-opacity="0.4"/>
-      <stop offset="100%" stop-color="#f472b6" stop-opacity="0.0"/>
-    </linearGradient>
-    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.0"/>
-      <stop offset="25%" stop-color="#a78bfa" stop-opacity="0.4"/>
-      <stop offset="50%" stop-color="#7cdbff" stop-opacity="0.45"/>
-      <stop offset="75%" stop-color="#10b981" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#10b981" stop-opacity="0.0"/>
-    </linearGradient>
-    <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#f472b6" stop-opacity="0.0"/>
-      <stop offset="30%" stop-color="#f472b6" stop-opacity="0.35"/>
-      <stop offset="60%" stop-color="#a78bfa" stop-opacity="0.4"/>
-      <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.0"/>
-    </linearGradient>
-    <linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#10b981" stop-opacity="0.0"/>
-      <stop offset="20%" stop-color="#10b981" stop-opacity="0.3"/>
-      <stop offset="50%" stop-color="#7cdbff" stop-opacity="0.4"/>
-      <stop offset="80%" stop-color="#a78bfa" stop-opacity="0.3"/>
-      <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.0"/>
-    </linearGradient>
-    <linearGradient id="g5" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#7cdbff" stop-opacity="0.0"/>
-      <stop offset="35%" stop-color="#7cdbff" stop-opacity="0.3"/>
-      <stop offset="65%" stop-color="#f472b6" stop-opacity="0.25"/>
-      <stop offset="100%" stop-color="#f472b6" stop-opacity="0.0"/>
+    <!-- Gradient for the line stroke -->
+    <linearGradient id="strokeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"  stop-color="#7c3aed"/>
+      <stop offset="50%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#f472b6"/>
+      <animateTransform attributeName="gradientTransform" type="rotate" from="0 0.5 0.5" to="360 0.5 0.5" dur="24s" repeatCount="indefinite"/>
     </linearGradient>
   </defs>
 
-  <!-- Dotted wave 1 — top -->
-  <path fill="none" stroke="url(#g1)" stroke-width="2" stroke-linecap="round"
-        stroke-dasharray="2 10"
-        d="M-200 140 C 100 80, 350 220, 620 140 S 1050 60, 1300 140 S 1550 220, 1700 140">
-    <animateTransform attributeName="transform" type="translate"
-      values="0,0; 80,0; 0,0" dur="8s" repeatCount="indefinite" calcMode="spline"
-      keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
-  </path>
+  <!-- Layered animated wave paths -->
+  <g fill="none" stroke="url(#strokeGrad)" stroke-width="2">
+    <!-- path 1 -->
+    <path opacity=".9">
+      <animate attributeName="d" dur="18s" repeatCount="indefinite"
+        values="
+          M0,220 C240,140 480,300 720,220 960,140 1200,300 1440,220
+          L1440,0 0,0 Z;
+          M0,220 C240,260 480,160 720,240 960,320 1200,160 1440,240
+          L1440,0 0,0 Z;
+          M0,220 C240,140 480,300 720,220 960,140 1200,300 1440,220
+          L1440,0 0,0 Z"/>
+      <animate attributeName="stroke-dasharray" values="1,8;4,10;1,8" dur="12s" repeatCount="indefinite"/>
+      <animate attributeName="stroke-dashoffset" values="0;-200;0" dur="12s" repeatCount="indefinite"/>
+    </path>
 
-  <!-- Dotted wave 2 — upper -->
-  <path fill="none" stroke="url(#g2)" stroke-width="2" stroke-linecap="round"
-        stroke-dasharray="2 10"
-        d="M-200 280 C 150 210, 400 360, 700 280 S 1100 180, 1350 280 S 1600 370, 1700 280">
-    <animateTransform attributeName="transform" type="translate"
-      values="0,0; -70,0; 0,0" dur="10s" repeatCount="indefinite" calcMode="spline"
-      keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
-  </path>
+    <!-- path 2 -->
+    <path opacity=".6">
+      <animate attributeName="d" dur="20s" repeatCount="indefinite"
+        values="
+          M0,420 C260,360 520,520 780,420 1040,320 1300,520 1440,460
+          L1440,300 0,300 Z;
+          M0,420 C260,500 520,360 780,460 1040,560 1300,360 1440,420
+          L1440,300 0,300 Z;
+          M0,420 C260,360 520,520 780,420 1040,320 1300,520 1440,460
+          L1440,300 0,300 Z"/>
+      <animate attributeName="stroke-dasharray" values="2,10;6,12;2,10" dur="14s" repeatCount="indefinite"/>
+      <animate attributeName="stroke-dashoffset" values="0;-300;0" dur="14s" repeatCount="indefinite"/>
+    </path>
 
-  <!-- Dotted wave 3 — middle -->
-  <path fill="none" stroke="url(#g3)" stroke-width="1.5" stroke-linecap="round"
-        stroke-dasharray="2 12"
-        d="M-200 420 C 200 350, 450 500, 750 420 S 1150 310, 1400 420 S 1650 510, 1700 420">
-    <animateTransform attributeName="transform" type="translate"
-      values="0,0; 90,0; 0,0" dur="11s" repeatCount="indefinite" calcMode="spline"
-      keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
-  </path>
-
-  <!-- Dotted wave 4 — lower -->
-  <path fill="none" stroke="url(#g4)" stroke-width="2" stroke-linecap="round"
-        stroke-dasharray="2 10"
-        d="M-200 560 C 120 490, 380 630, 680 560 S 1080 450, 1320 560 S 1580 650, 1700 560">
-    <animateTransform attributeName="transform" type="translate"
-      values="0,0; -75,0; 0,0" dur="9s" repeatCount="indefinite" calcMode="spline"
-      keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
-  </path>
-
-  <!-- Dotted wave 5 — bottom (faint) -->
-  <path fill="none" stroke="url(#g5)" stroke-width="1.5" stroke-linecap="round"
-        stroke-dasharray="2 12"
-        d="M-200 700 C 180 640, 430 770, 730 700 S 1120 590, 1380 700 S 1620 790, 1700 700">
-    <animateTransform attributeName="transform" type="translate"
-      values="0,0; 65,0; 0,0" dur="12s" repeatCount="indefinite" calcMode="spline"
-      keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
-  </path>
-
-  <!-- Extra faint dotted wave 6 — very top -->
-  <path fill="none" stroke="url(#g2)" stroke-width="1" stroke-linecap="round"
-        stroke-dasharray="1.5 14"
-        opacity="0.5"
-        d="M-200 60 C 200 20, 500 100, 800 60 S 1200 10, 1440 60 S 1600 100, 1700 60">
-    <animateTransform attributeName="transform" type="translate"
-      values="0,0; -55,0; 0,0" dur="13s" repeatCount="indefinite" calcMode="spline"
-      keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
-  </path>
-
-  <!-- Extra faint dotted wave 7 — very bottom -->
-  <path fill="none" stroke="url(#g1)" stroke-width="1" stroke-linecap="round"
-        stroke-dasharray="1.5 14"
-        opacity="0.4"
-        d="M-200 820 C 250 770, 500 860, 780 820 S 1150 750, 1400 820 S 1620 870, 1700 820">
-    <animateTransform attributeName="transform" type="translate"
-      values="0,0; 50,0; 0,0" dur="10s" repeatCount="indefinite" calcMode="spline"
-      keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
-  </path>
+    <!-- path 3 -->
+    <path opacity=".35">
+      <animate attributeName="d" dur="22s" repeatCount="indefinite"
+        values="
+          M0,640 C220,560 520,760 760,640 1000,520 1240,760 1440,700
+          L1440,520 0,520 Z;
+          M0,640 C220,720 520,560 760,680 1000,800 1240,560 1440,640
+          L1440,520 0,520 Z;
+          M0,640 C220,560 520,760 760,640 1000,520 1240,760 1440,700
+          L1440,520 0,520 Z"/>
+      <animate attributeName="stroke-dasharray" values="3,14;8,16;3,14" dur="16s" repeatCount="indefinite"/>
+      <animate attributeName="stroke-dashoffset" values="0;-400;0" dur="16s" repeatCount="indefinite"/>
+    </path>
+  </g>
 </svg>
