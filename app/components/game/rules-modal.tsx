@@ -36,7 +36,7 @@ export function RulesModal({ isOpen, onClose }: RulesModalProps) {
                         <div className="flex items-center gap-3">
                             <span className="text-3xl">📜</span>
                             <div>
-                                <h2 className="text-xl font-bold text-gold-gradient">Rules & How to Play</h2>
+                                <h2 className="text-xl font-bold text-aurora-gradient">Rules & How to Play</h2>
                                 <p className="text-xs text-muted mt-0.5">Everything you need to know</p>
                             </div>
                         </div>
@@ -66,7 +66,7 @@ export function RulesModal({ isOpen, onClose }: RulesModalProps) {
                                     }`}
                                 style={activeTab === i ? {
                                     background: 'var(--accent-dim)',
-                                    border: '1px solid rgba(245, 197, 24, 0.15)',
+                                    border: '1px solid rgba(124, 219, 255, 0.15)',
                                 } : { border: '1px solid transparent' }}
                             >
                                 <span className="block text-base mb-0.5">{tab.icon}</span>
@@ -94,8 +94,8 @@ function StepCard({ step, icon, title, description }: { step: number; icon: stri
             <div className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold transition-colors duration-300 group-hover:scale-105"
                 style={{
                     background: 'var(--accent-dim)',
-                    color: 'var(--accent)',
-                    border: '1px solid rgba(245, 197, 24, 0.1)',
+                    color: 'var(--primary)',
+                    border: '1px solid rgba(124, 219, 255, 0.1)',
                 }}
             >
                 {step}
@@ -113,8 +113,8 @@ function StepCard({ step, icon, title, description }: { step: number; icon: stri
 function HowToPlayTab() {
     return (
         <div className="space-y-5">
-            <div className="rounded-xl px-4 py-3.5" style={{ background: 'var(--accent-dim)', border: '1px solid rgba(245, 197, 24, 0.1)' }}>
-                <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--accent)' }}>🏆 Goal</p>
+            <div className="rounded-xl px-4 py-3.5" style={{ background: 'var(--accent-dim)', border: '1px solid rgba(124, 219, 255, 0.1)' }}>
+                <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--primary)' }}>🏆 Goal</p>
                 <p className="text-sm text-foreground leading-relaxed">
                     Be the <strong>last King standing</strong> when the timer hits zero to win the entire prize pot!
                 </p>
@@ -152,8 +152,8 @@ function MultipliersTab() {
 
     return (
         <div className="space-y-4">
-            <div className="rounded-xl px-4 py-3.5" style={{ background: 'var(--accent-dim)', border: '1px solid rgba(245, 197, 24, 0.1)' }}>
-                <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--accent)' }}>How Multipliers Work</p>
+            <div className="rounded-xl px-4 py-3.5" style={{ background: 'var(--accent-dim)', border: '1px solid rgba(124, 219, 255, 0.1)' }}>
+                <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--primary)' }}>How Multipliers Work</p>
                 <p className="text-sm text-foreground leading-relaxed">
                     Your multiplier determines <strong>how much you pay</strong>. The price you pay = base price × your chosen multiplier. 
                     Your payment then becomes the new base price for the next player.
@@ -209,8 +209,8 @@ function ExampleTab() {
 
     return (
         <div className="space-y-4">
-            <div className="rounded-xl px-4 py-3.5" style={{ background: 'var(--accent-dim)', border: '1px solid rgba(245, 197, 24, 0.1)' }}>
-                <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--accent)' }}>📊 Example Game Scenario</p>
+            <div className="rounded-xl px-4 py-3.5" style={{ background: 'var(--accent-dim)', border: '1px solid rgba(124, 219, 255, 0.1)' }}>
+                <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--primary)' }}>📊 Example Game Scenario</p>
                 <p className="text-sm text-foreground leading-relaxed">
                     Watch how the pot grows as each player chooses their multiplier. The base price is 0.01 SOL.
                 </p>
@@ -240,7 +240,7 @@ function ExampleTab() {
                         </div>
                         <div className="col-span-2 text-center font-mono text-muted">{r.multiplier}</div>
                         <div className="col-span-3 text-right font-mono text-foreground">{r.paid}</div>
-                        <div className="col-span-4 text-right font-mono text-gold-gradient font-bold">{r.pot}</div>
+                        <div className="col-span-4 text-right font-mono text-aurora-gradient font-bold">{r.pot}</div>
                     </div>
                 ))}
             </div>
@@ -261,8 +261,8 @@ function ExampleTab() {
 function StrategyTab() {
     return (
         <div className="space-y-4">
-            <div className="rounded-xl px-4 py-3.5" style={{ background: 'var(--accent-dim)', border: '1px solid rgba(245, 197, 24, 0.1)' }}>
-                <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--accent)' }}>🧠 Tips & Strategy</p>
+            <div className="rounded-xl px-4 py-3.5" style={{ background: 'var(--accent-dim)', border: '1px solid rgba(124, 219, 255, 0.1)' }}>
+                <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--primary)' }}>🧠 Tips & Strategy</p>
                 <p className="text-sm text-foreground leading-relaxed">
                     Understanding the game mechanics gives you an edge. Here are some strategies to consider.
                 </p>
@@ -272,7 +272,7 @@ function StrategyTab() {
                 <StrategyCard icon="🐢" title="Low Multiplier (1.25x)" description="Cheaper entry = less risk. But the pot grows slowly, making it more attractive for others to wait." tag="Conservative" tagColor="#34d399" />
                 <StrategyCard icon="🚀" title="High Multiplier (3.0x)" description="Expensive entry = bigger pot. Deters casual players but attracts whales. High risk, high reward." tag="Aggressive" tagColor="#ef4444" />
                 <StrategyCard icon="⏱️" title="Timing Matters" description="Bidding in the last 60 seconds triggers anti-snipe (1 min extension only). Use this to put pressure on opponents!" tag="Advanced" tagColor="#a78bfa" />
-                <StrategyCard icon="💰" title="Watch the Pot" description="The larger the pot, the more incentive others have to bid. Consider the pot-to-cost ratio before committing." tag="Key Insight" tagColor="#fbbf24" />
+                <StrategyCard icon="💰" title="Watch the Pot" description="The larger the pot, the more incentive others have to bid. Consider the pot-to-cost ratio before committing." tag="Key Insight" tagColor="#7cdbff" />
                 <StrategyCard icon="🔄" title="New Round Opportunity" description="When a game expires, anyone can start a new round at the base 0.01 SOL price. Unclaimed prizes carry over to the new pot!" tag="Opportunity" tagColor="#60a5fa" />
             </div>
         </div>
@@ -314,9 +314,9 @@ export function RulesButton({ onClick }: { onClick: () => void }) {
                 color: 'var(--muted)',
             }}
             onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(245, 197, 24, 0.15)';
-                e.currentTarget.style.color = 'var(--accent)';
-                e.currentTarget.style.boxShadow = '0 8px 32px -12px rgba(245, 197, 24, 0.15)';
+                e.currentTarget.style.borderColor = 'rgba(124, 219, 255, 0.15)';
+                e.currentTarget.style.color = 'var(--primary)';
+                e.currentTarget.style.boxShadow = '0 8px 32px -12px rgba(124, 219, 255, 0.15)';
             }}
             onMouseLeave={(e) => {
                 e.currentTarget.style.borderColor = 'var(--border-low)';

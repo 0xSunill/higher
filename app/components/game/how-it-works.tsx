@@ -32,7 +32,7 @@ export function HowItWorks({ gameState, gameStatePda }: HowItWorksProps) {
                     </div>
                 ))}
             </div>
-            <div className="divider-gold" />
+            <div className="divider-aurora" />
             <div className="flex items-center gap-3">
                 {gameStatePda && (
                     <p className="flex-1 truncate font-mono text-[10px] text-muted/40">

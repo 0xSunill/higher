@@ -17,7 +17,7 @@ export function GameHeader({ gameState, hasKing, isKing, timerStarted, countdown
             <div className="glass-card-glow rounded-2xl p-7 animate-border-shimmer">
                 <div className="flex flex-col items-center gap-4">
                     <div className="relative">
-                        <span className="text-7xl animate-crown-float inline-block drop-shadow-[0_0_40px_rgba(245,197,24,0.2)]">
+                        <span className="text-7xl animate-crown-float inline-block drop-shadow-[0_0_40px_rgba(167,139,250,0.25)]">
                             👑
                         </span>
                         {isKing && (
@@ -27,7 +27,7 @@ export function GameHeader({ gameState, hasKing, isKing, timerStarted, countdown
                     <div className="text-center space-y-2">
                         <p className="section-label">Current King</p>
                         {hasKing ? (
-                            <p className="text-xl font-bold font-mono text-gold-gradient tracking-wide">
+                            <p className="text-xl font-bold font-mono text-aurora-gradient tracking-wide">
                                 {formatAddress(gameState.currentKing)}
                             </p>
                         ) : (
@@ -39,8 +39,8 @@ export function GameHeader({ gameState, hasKing, isKing, timerStarted, countdown
                             <span className="inline-flex items-center gap-1.5 mt-1 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider"
                                 style={{
                                     background: 'var(--accent-dim)',
-                                    color: 'var(--accent)',
-                                    border: '1px solid rgba(245, 197, 24, 0.15)'
+                                    color: 'var(--primary)',
+                                    border: '1px solid rgba(124, 219, 255, 0.15)'
                                 }}
                             >
                                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-current" />
@@ -56,7 +56,7 @@ export function GameHeader({ gameState, hasKing, isKing, timerStarted, countdown
                 {/* Prize Pot */}
                 <div className="glass-card stat-card rounded-xl p-4 text-center">
                     <p className="section-label mb-2">Prize Pot</p>
-                    <p className="text-2xl sm:text-3xl font-extrabold tabular-nums text-gold-gradient">
+                    <p className="text-2xl sm:text-3xl font-extrabold tabular-nums text-aurora-gradient">
                         {formatSol(gameState.potAmount)}
                     </p>
                     <p className="text-[10px] text-muted mt-1 font-medium uppercase tracking-wider">SOL</p>
@@ -101,7 +101,7 @@ export function GameHeader({ gameState, hasKing, isKing, timerStarted, countdown
                 {/* Current Price */}
                 <div className="glass-card stat-card rounded-xl p-4 text-center">
                     <p className="section-label mb-2">Base Price</p>
-                    <p className="text-2xl sm:text-3xl font-extrabold tabular-nums text-gold-gradient">
+                    <p className="text-2xl sm:text-3xl font-extrabold tabular-nums text-aurora-gradient">
                         {formatSol(isExpired ? 10000000n : gameState.currentPrice)}
                     </p>
                     <p className="text-[10px] text-muted mt-1 font-medium uppercase tracking-wider">SOL</p>

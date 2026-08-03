@@ -50,13 +50,13 @@ export function GameControls({
                 <div className="space-y-4">
                     <div className="text-center space-y-2 py-2">
                         <div className="text-5xl animate-crown-float">🏆</div>
-                        <p className="text-xl font-bold text-gold-gradient">You Won!</p>
+                        <p className="text-xl font-bold text-aurora-gradient">You Won!</p>
                         <p className="text-sm text-muted">Claim your prize from the pot</p>
                     </div>
                     <button
                         onClick={handleClaimPrize}
                         disabled={isSending}
-                        className="btn-gold w-full rounded-xl px-6 py-4 text-lg tracking-wide"
+                        className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide"
                     >
                         {isSending ? "Claiming..." : `🏆 Claim Prize — ${formatSol(gameState.potAmount)} SOL`}
                     </button>
@@ -74,7 +74,7 @@ export function GameControls({
                         </p>
                     </div>
 
-                    <div className="divider-gold" />
+                    <div className="divider-aurora" />
 
                     {/* Multiplier selector */}
                     <div>
@@ -97,7 +97,7 @@ export function GameControls({
                     <button
                         onClick={handleStartNewRound}
                         disabled={isSending}
-                        className="btn-gold w-full rounded-xl px-6 py-4 text-lg tracking-wide"
+                        className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide"
                     >
                         {isSending ? "Starting..." : "🔄 Start New Round — 0.0100 SOL"}
                     </button>
@@ -119,7 +119,7 @@ export function GameControls({
                                     {selectedMultiplier.bps === option.bps && (
                                         <span className="absolute -top-1 -right-1 flex h-3 w-3">
                                             <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-60" style={{ animation: 'ping-soft 1.5s cubic-bezier(0, 0, 0.2, 1) infinite' }} />
-                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-primary shadow-[0_0_6px_rgba(245,197,24,0.4)]" />
+                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-primary shadow-[0_0_6px_rgba(124,219,255,0.4)]" />
                                         </span>
                                     )}
                                 </button>
@@ -127,7 +127,7 @@ export function GameControls({
                         </div>
                     </div>
 
-                    <div className="divider-gold" />
+                    <div className="divider-aurora" />
 
                     {/* Price Preview */}
                     <div className="rounded-xl p-4 flex items-center justify-between gap-2" style={{ background: 'var(--surface-1)' }}>
@@ -149,7 +149,7 @@ export function GameControls({
                         </div>
                         <div className="text-right">
                             <p className="section-label">You pay</p>
-                            <p className="text-lg font-bold text-gold-gradient mt-1">
+                            <p className="text-lg font-bold text-aurora-gradient mt-1">
                                 {formatSol(yourPrice)} <span className="text-xs font-medium" style={{ WebkitTextFillColor: 'var(--muted)' }}>SOL</span>
                             </p>
                         </div>
@@ -159,7 +159,7 @@ export function GameControls({
                     <button
                         onClick={handleBecomeKing}
                         disabled={isSending}
-                        className="btn-gold w-full rounded-xl px-6 py-4 text-lg tracking-wide"
+                        className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide"
                     >
                         {isSending
                             ? "Confirming..."

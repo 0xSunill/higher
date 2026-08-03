@@ -36,6 +36,20 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${inter.variable} ${geistMono.variable} antialiased`}
       >
+        {/* Animated aurora wave lines — fixed background */}
+        <div className="bg-aurora-lines">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/bg-lines.svg"
+            alt=""
+            aria-hidden="true"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        </div>
+
+        {/* Noise texture overlay */}
+        <div className="bg-noise" />
+
         <Providers>
           {children}
         </Providers>

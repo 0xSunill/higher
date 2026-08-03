@@ -39,19 +39,19 @@ export function PreviousWinners({ gameState, showWinnerDetails, setShowWinnerDet
                             <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold"
                                 style={{
                                     background: 'var(--accent-dim)',
-                                    color: 'var(--accent)',
+                                    color: 'var(--primary)',
                                 }}
                             >
                                 {validWinners.length}
                             </span>
                         </p>
-                        <p className="text-sm font-bold font-mono text-gold-gradient mt-1">
+                        <p className="text-sm font-bold font-mono text-aurora-gradient mt-1">
                             {formatAddress(latestWinner.address)}
                         </p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-gold-gradient">{formatSol(latestWinner.prize)} SOL</span>
+                    <span className="text-sm font-bold text-aurora-gradient">{formatSol(latestWinner.prize)} SOL</span>
                     <span className={`text-muted text-xs transition-transform duration-300 ${showWinnerDetails ? "rotate-180" : ""}`}>
                         ▾
                     </span>
@@ -76,7 +76,7 @@ export function PreviousWinners({ gameState, showWinnerDetails, setShowWinnerDet
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="text-sm font-bold text-gold-gradient">{formatSol(winner.prize)} SOL</p>
+                                <p className="text-sm font-bold text-aurora-gradient">{formatSol(winner.prize)} SOL</p>
                             </div>
                         </div>
                     ))}

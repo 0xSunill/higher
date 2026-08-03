@@ -22,13 +22,13 @@ export default function Home() {
         {/* Header */}
         <header className="text-center space-y-5 animate-fadeInUp">
           <div className="inline-flex items-center justify-center">
-            <span className="text-6xl animate-crown-float drop-shadow-[0_0_30px_rgba(245,197,24,0.2)]">👑</span>
+            <span className="text-6xl animate-crown-float drop-shadow-[0_0_30px_rgba(167,139,250,0.25)]">👑</span>
           </div>
           <div className="space-y-2">
-            <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-gold-shimmer">
+            <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-aurora-shimmer">
               HIGHER
             </h1>
-            <div className="divider-gold mx-auto w-24 my-3" />
+            <div className="divider-aurora mx-auto w-24 my-3" />
             <p className="text-xs uppercase tracking-[0.25em] text-muted font-medium">
               King of the Hill on Solana
             </p>
@@ -109,7 +109,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="text-center pb-8 pt-4">
-          <div className="divider-gold mx-auto w-16 mb-4" />
+          <div className="divider-aurora mx-auto w-16 mb-4" />
           <p className="text-[10px] text-muted/40 uppercase tracking-[0.2em] font-medium">
             Built on Solana Devnet • Anchor Framework
           </p>

@@ -272,15 +272,15 @@ export function GameCard() {
         return (
             <section className="w-full max-w-2xl mx-auto glass-card-glow rounded-2xl p-8 animate-fadeInUp">
                 <div className="text-center space-y-5 py-6">
-                    <div className="text-7xl animate-crown-float drop-shadow-[0_0_30px_rgba(245,197,24,0.15)]">👑</div>
+                    <div className="text-7xl animate-crown-float drop-shadow-[0_0_30px_rgba(167,139,250,0.2)]">👑</div>
                     <div className="space-y-2">
-                        <h2 className="text-2xl font-bold text-gold-shimmer">No Game Active</h2>
+                        <h2 className="text-2xl font-bold text-aurora-shimmer">No Game Active</h2>
                         <p className="text-sm text-muted max-w-sm mx-auto leading-relaxed">
                             Be the first to initialize a new round of Higher! Set up the game and become the founding King.
                         </p>
                     </div>
                     {status === "connected" ? (
-                        <button onClick={handleInitialize} disabled={isSending} className="btn-gold rounded-xl px-8 py-3.5 text-lg">
+                        <button onClick={handleInitialize} disabled={isSending} className="btn-aurora rounded-xl px-8 py-3.5 text-lg">
                             {isSending ? "Initializing..." : "🏰 Initialize Game"}
                         </button>
                     ) : (

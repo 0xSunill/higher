@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7cdbff" stop-opacity="0.0"/>
+      <stop offset="20%" stop-color="#7cdbff" stop-opacity="0.5"/>
+      <stop offset="50%" stop-color="#a78bfa" stop-opacity="0.45"/>
+      <stop offset="80%" stop-color="#f472b6" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#f472b6" stop-opacity="0.0"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.0"/>
+      <stop offset="25%" stop-color="#a78bfa" stop-opacity="0.4"/>
+      <stop offset="50%" stop-color="#7cdbff" stop-opacity="0.45"/>
+      <stop offset="75%" stop-color="#10b981" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.0"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f472b6" stop-opacity="0.0"/>
+      <stop offset="30%" stop-color="#f472b6" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#a78bfa" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.0"/>
+    </linearGradient>
+    <linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.0"/>
+      <stop offset="20%" stop-color="#10b981" stop-opacity="0.3"/>
+      <stop offset="50%" stop-color="#7cdbff" stop-opacity="0.4"/>
+      <stop offset="80%" stop-color="#a78bfa" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.0"/>
+    </linearGradient>
+    <linearGradient id="g5" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7cdbff" stop-opacity="0.0"/>
+      <stop offset="35%" stop-color="#7cdbff" stop-opacity="0.3"/>
+      <stop offset="65%" stop-color="#f472b6" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#f472b6" stop-opacity="0.0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Dotted wave 1 — top -->
+  <path fill="none" stroke="url(#g1)" stroke-width="2" stroke-linecap="round"
+        stroke-dasharray="2 10"
+        d="M-200 140 C 100 80, 350 220, 620 140 S 1050 60, 1300 140 S 1550 220, 1700 140">
+    <animateTransform attributeName="transform" type="translate"
+      values="0,0; 80,0; 0,0" dur="8s" repeatCount="indefinite" calcMode="spline"
+      keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
+  </path>
+
+  <!-- Dotted wave 2 — upper -->
+  <path fill="none" stroke="url(#g2)" stroke-width="2" stroke-linecap="round"
+        stroke-dasharray="2 10"
+        d="M-200 280 C 150 210, 400 360, 700 280 S 1100 180, 1350 280 S 1600 370, 1700 280">
+    <animateTransform attributeName="transform" type="translate"
+      values="0,0; -70,0; 0,0" dur="10s" repeatCount="indefinite" calcMode="spline"
+      keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
+  </path>
+
+  <!-- Dotted wave 3 — middle -->
+  <path fill="none" stroke="url(#g3)" stroke-width="1.5" stroke-linecap="round"
+        stroke-dasharray="2 12"
+        d="M-200 420 C 200 350, 450 500, 750 420 S 1150 310, 1400 420 S 1650 510, 1700 420">
+    <animateTransform attributeName="transform" type="translate"
+      values="0,0; 90,0; 0,0" dur="11s" repeatCount="indefinite" calcMode="spline"
+      keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
+  </path>
+
+  <!-- Dotted wave 4 — lower -->
+  <path fill="none" stroke="url(#g4)" stroke-width="2" stroke-linecap="round"
+        stroke-dasharray="2 10"
+        d="M-200 560 C 120 490, 380 630, 680 560 S 1080 450, 1320 560 S 1580 650, 1700 560">
+    <animateTransform attributeName="transform" type="translate"
+      values="0,0; -75,0; 0,0" dur="9s" repeatCount="indefinite" calcMode="spline"
+      keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
+  </path>
+
+  <!-- Dotted wave 5 — bottom (faint) -->
+  <path fill="none" stroke="url(#g5)" stroke-width="1.5" stroke-linecap="round"
+        stroke-dasharray="2 12"
+        d="M-200 700 C 180 640, 430 770, 730 700 S 1120 590, 1380 700 S 1620 790, 1700 700">
+    <animateTransform attributeName="transform" type="translate"
+      values="0,0; 65,0; 0,0" dur="12s" repeatCount="indefinite" calcMode="spline"
+      keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
+  </path>
+
+  <!-- Extra faint dotted wave 6 — very top -->
+  <path fill="none" stroke="url(#g2)" stroke-width="1" stroke-linecap="round"
+        stroke-dasharray="1.5 14"
+        opacity="0.5"
+        d="M-200 60 C 200 20, 500 100, 800 60 S 1200 10, 1440 60 S 1600 100, 1700 60">
+    <animateTransform attributeName="transform" type="translate"
+      values="0,0; -55,0; 0,0" dur="13s" repeatCount="indefinite" calcMode="spline"
+      keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
+  </path>
+
+  <!-- Extra faint dotted wave 7 — very bottom -->
+  <path fill="none" stroke="url(#g1)" stroke-width="1" stroke-linecap="round"
+        stroke-dasharray="1.5 14"
+        opacity="0.4"
+        d="M-200 820 C 250 770, 500 860, 780 820 S 1150 750, 1400 820 S 1620 870, 1700 820">
+    <animateTransform attributeName="transform" type="translate"
+      values="0,0; 50,0; 0,0" dur="10s" repeatCount="indefinite" calcMode="spline"
+      keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
+  </path>
+</svg>
