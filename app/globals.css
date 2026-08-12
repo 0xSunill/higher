@@ -212,7 +212,7 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.15;
+  opacity: 0.4;
 }
 
 .bg-aurora-lines img,
@@ -250,7 +250,7 @@
   top: -200px;
   left: 50%;
   transform: translateX(-50%);
-  background: radial-gradient(circle, rgba(124, 219, 255, 0.06) 0%, rgba(167, 139, 250, 0.03) 40%, transparent 70%);
+  background: radial-gradient(circle, rgba(124, 219, 255, 0.12) 0%, rgba(167, 139, 250, 0.08) 40%, transparent 70%);
   animation: orb-float 20s ease-in-out infinite;
 }
 
@@ -259,7 +259,7 @@
   height: 400px;
   bottom: -100px;
   right: -100px;
-  background: radial-gradient(circle, rgba(167, 139, 250, 0.05) 0%, rgba(244, 114, 182, 0.03) 40%, transparent 70%);
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.1) 0%, rgba(244, 114, 182, 0.08) 40%, transparent 70%);
   animation: orb-float 25s ease-in-out infinite reverse;
 }
 
