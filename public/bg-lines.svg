@@ -1,0 +1,57 @@
+<!-- Aurora Waves — lines only, fully transparent background -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- Gradient for the line stroke -->
+    <linearGradient id="strokeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"  stop-color="#7c3aed"/>
+      <stop offset="50%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#f472b6"/>
+      <animateTransform attributeName="gradientTransform" type="rotate" from="0 0.5 0.5" to="360 0.5 0.5" dur="24s" repeatCount="indefinite"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Layered animated wave paths -->
+  <g fill="none" stroke="url(#strokeGrad)" stroke-width="2">
+    <!-- path 1 -->
+    <path opacity=".9">
+      <animate attributeName="d" dur="18s" repeatCount="indefinite"
+        values="
+          M0,220 C240,140 480,300 720,220 960,140 1200,300 1440,220
+          L1440,0 0,0 Z;
+          M0,220 C240,260 480,160 720,240 960,320 1200,160 1440,240
+          L1440,0 0,0 Z;
+          M0,220 C240,140 480,300 720,220 960,140 1200,300 1440,220
+          L1440,0 0,0 Z"/>
+      <animate attributeName="stroke-dasharray" values="1,8;4,10;1,8" dur="12s" repeatCount="indefinite"/>
+      <animate attributeName="stroke-dashoffset" values="0;-200;0" dur="12s" repeatCount="indefinite"/>
+    </path>
+
+    <!-- path 2 -->
+    <path opacity=".6">
+      <animate attributeName="d" dur="20s" repeatCount="indefinite"
+        values="
+          M0,420 C260,360 520,520 780,420 1040,320 1300,520 1440,460
+          L1440,300 0,300 Z;
+          M0,420 C260,500 520,360 780,460 1040,560 1300,360 1440,420
+          L1440,300 0,300 Z;
+          M0,420 C260,360 520,520 780,420 1040,320 1300,520 1440,460
+          L1440,300 0,300 Z"/>
+      <animate attributeName="stroke-dasharray" values="2,10;6,12;2,10" dur="14s" repeatCount="indefinite"/>
+      <animate attributeName="stroke-dashoffset" values="0;-300;0" dur="14s" repeatCount="indefinite"/>
+    </path>
+
+    <!-- path 3 -->
+    <path opacity=".35">
+      <animate attributeName="d" dur="22s" repeatCount="indefinite"
+        values="
+          M0,640 C220,560 520,760 760,640 1000,520 1240,760 1440,700
+          L1440,520 0,520 Z;
+          M0,640 C220,720 520,560 760,680 1000,800 1240,560 1440,640
+          L1440,520 0,520 Z;
+          M0,640 C220,560 520,760 760,640 1000,520 1240,760 1440,700
+          L1440,520 0,520 Z"/>
+      <animate attributeName="stroke-dasharray" values="3,14;8,16;3,14" dur="16s" repeatCount="indefinite"/>
+      <animate attributeName="stroke-dashoffset" values="0;-400;0" dur="16s" repeatCount="indefinite"/>
+    </path>
+  </g>
+</svg>
