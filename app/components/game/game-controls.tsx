@@ -41,10 +41,7 @@ export function GameControls({
     handleStartNewRound,
     handleBecomeKing,
 }: GameControlsProps) {
-    
-    const handleConnectClick = () => {
-        if (connectors.length > 0) connect(connectors[0].id);
-    };
+    // We removed handleConnectClick as we are disabling the buttons instead
 
     return (
         <div className="glass-card rounded-2xl p-6 space-y-5 animate-fadeInUp stagger-3 h-full flex flex-col justify-center">
@@ -58,20 +55,20 @@ export function GameControls({
                         <p className="text-2xl font-bold text-foreground drop-shadow-sm">You Won!</p>
                         <p className="text-sm text-muted">Claim your prize from the pot</p>
                     </div>
-                    {status !== "connected" ? (
-                        <button onClick={handleConnectClick} className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2">
-                            <Wallet size={20} /> Connect Wallet
-                        </button>
-                    ) : (
-                        <button
-                            onClick={handleClaimPrize}
-                            disabled={isSending}
-                            className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2"
-                        >
-                            <Trophy size={20} />
-                            {isSending ? "Claiming..." : `Claim Prize — ${formatSol(gameState.potAmount)} SOL`}
-                        </button>
-                    )}
+                    <button
+                        onClick={handleClaimPrize}
+                        disabled={status !== "connected" || isSending}
+                        className={`btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2 ${
+                            status !== "connected" ? "opacity-50 cursor-not-allowed grayscale" : ""
+                        }`}
+                    >
+                        <Trophy size={20} className="disabled:text-red-400"/>
+                        {status !== "connected" 
+                            ? "Connect Wallet to Claim" 
+                            : isSending 
+                                ? "Claiming..." 
+                                : `Claim Prize — ${formatSol(gameState.potAmount)} SOL`}
+                    </button>
                 </div>
             ) : isExpired ? (
                 /* Game over — start new round */
@@ -108,20 +105,20 @@ export function GameControls({
                         </div>
                     </div>
 
-                    {status !== "connected" ? (
-                        <button onClick={handleConnectClick} className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2">
-                            <Wallet size={20} /> Connect Wallet
-                        </button>
-                    ) : (
-                        <button
-                            onClick={handleStartNewRound}
-                            disabled={isSending}
-                            className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2"
-                        >
-                            <RotateCcw size={20} />
-                            {isSending ? "Starting..." : "Start New Round — 0.0100 SOL"}
-                        </button>
-                    )}
+                    <button
+                        onClick={handleStartNewRound}
+                        disabled={status !== "connected" || isSending}
+                        className={`btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2 ${
+                            status !== "connected" ? "opacity-50 cursor-not-allowed grayscale" : ""
+                        }`}
+                    >
+                        <RotateCcw size={20} />
+                        {status !== "connected"
+                            ? "Connect Wallet to Start"
+                            : isSending
+                                ? "Starting..."
+                                : "Start New Round — 0.0100 SOL"}
+                    </button>
                 </div>
             ) : (
                 /* Active game — become king */
@@ -176,30 +173,29 @@ export function GameControls({
                         </div>
                     </div>
 
-                    {/* CTA Button */}
-                    {status !== "connected" ? (
-                        <button onClick={handleConnectClick} className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2">
-                            <Wallet size={20} /> Connect Wallet
-                        </button>
-                    ) : (
-                        <button
-                            onClick={handleBecomeKing}
-                            disabled={isSending}
-                            className="btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2"
-                        >
-                            {isSending ? (
-                                "Confirming..."
-                            ) : hasKing ? (
-                                <>
-                                    <Rocket size={20} /> Go Higher — {formatSol(yourPrice)} SOL
-                                </>
-                            ) : (
-                                <>
-                                    <Crown size={20} /> Become First King — {formatSol(yourPrice)} SOL
-                                </>
-                            )}
-                        </button>
-                    )}
+                    <button
+                        onClick={handleBecomeKing}
+                        disabled={status !== "connected" || isSending}
+                        className={`btn-aurora w-full rounded-xl px-6 py-4 text-lg tracking-wide flex items-center justify-center gap-2 ${
+                            status !== "connected" ? "opacity-50 cursor-not-allowed grayscale" : ""
+                        }`}
+                    >
+                        {status !== "connected" ? (
+                            <>
+                                <Wallet size={20} /> Connect Wallet to Play
+                            </>
+                        ) : isSending ? (
+                            "Confirming..."
+                        ) : hasKing ? (
+                            <>
+                                <Rocket size={20} /> Go Higher — {formatSol(yourPrice)} SOL
+                            </>
+                        ) : (
+                            <>
+                                <Crown size={20} /> Become First King — {formatSol(yourPrice)} SOL
+                            </>
+                        )}
+                    </button>
                 </div>
             )}
 
